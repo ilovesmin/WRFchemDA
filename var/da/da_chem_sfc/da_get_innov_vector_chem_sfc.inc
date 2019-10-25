@@ -82,7 +82,9 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
 
          ! [2.0] Initialise components of innovation vector: 
 
-         iv % chemic_surf(n) % chem(ichem) % inv = 0.0
+         iv % chemic_surf(n) % chem(ichem) % inv   = missing_r
+         iv % chemic_surf(n) % chem(ichem) % qc    = missing
+         iv % chemic_surf(n) % chem(ichem) % error = missing_r
 
          ! [3.0] To compute the 'inv':
          if (ob % chemic_surf(n) % chem(ichem) > missing_r .and. iv % chemic_surf(n) % chem(ichem) % qc >=  obs_qc_pointer) then
