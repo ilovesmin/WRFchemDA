@@ -105,6 +105,7 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
             !      0.5*(1.0+0.0075*ob % chemic_surf(n) % chem(ichem))*sqrt(grid%dx/2000.0))
 
             ! Quality Control
+            ! ----------------
             if (abs(iv % chemic_surf(n) % chem(ichem) % inv) .ge. maxomb) then
                 iv % chemic_surf(n) % chem(ichem) % inv   = missing_r
                 iv % chemic_surf(n) % chem(ichem) % qc    = missing
@@ -119,9 +120,9 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
                 end if
               end if
             end if
-         else       ! missing or bad obs
-            iv % chemic_surf(n) % chem(ichem) % inv = missing_r
-         end if	      
+            ! ----------------
+
+         end if	   ! good obs      
       end do
    end do
 
