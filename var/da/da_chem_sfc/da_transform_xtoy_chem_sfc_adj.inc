@@ -56,19 +56,23 @@ subroutine da_transform_xtoy_chem_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
 
      if (chem_cv_options == 108) then  ! racm_soa_vbs_da
 
-        if (chemicda_opt <= 4 ) then
+       if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then 
 
-           if (chemicda_opt > 1) then   ! pm10
+           ! pm10
            do n = p_chem_ic_so4aj, p_chem_ic_soila
               model_chemic(:,n) = model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm10)
            enddo
-           endif  
 
-           do n = p_chem_ic_so4aj, p_chem_ic_p25i   ! pm25
+       endif  !  if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5) 
+
+       if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then
+
+           ! pm2.5
+           do n = p_chem_ic_so4aj, p_chem_ic_p25i
               model_chemic(:,n) = model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm25)
            enddo
 
-        endif !(chemicda_opt <= 4 )
+        endif !  if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 5)
        
         do ichem = PARAM_FIRST_SCALAR, num_chem
           call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
