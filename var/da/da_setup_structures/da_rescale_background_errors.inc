@@ -21,7 +21,7 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
 
    if (trace_use_dull) call da_trace_entry("da_rescale_background_errors")
 
-   write(unit=stdout,fmt='(3x,"Scaling: var, len, ds:",3e15.6 )') &
+   write(unit=stdout,fmt='(3x,"Scaling: var, len, ds:",3f9.2)') &
                                      var_scaling, len_scaling, ds
 
    !--------------------------------------------------------------------------
@@ -40,10 +40,10 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
       s(1:mz) = len_scaling * s(1:mz)
    
       if (print_detail_be) then
-         write(unit=stdout,fmt='(a,a)')trim(be_sub % name), ' Error Lengthscales (m):'
-         do m = 1, mz
-            write(unit=stdout,fmt='(a,i4,1pe13.5)')be_sub % name, m, s(m)
-         end do
+         !write(unit=stdout,fmt='(a,a)')trim(be_sub % name), ' Error Lengthscales (m=1):'
+         !do m = 1, mz
+         !   write(unit=stdout,fmt='(a,i4,1pe13.5)')be_sub % name, m, s(m)
+         !end do
       end if
       
       ! [2.2] Make lengthscale nondimensional:
@@ -62,6 +62,9 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
       do m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
       end do
+      m = 1
+      !write(unit=stdout,fmt='(a,a,3f12.5,3f7.1)') 'rescale_be (j=89,m=1):',&
+      !      be_sub%name, s(m),be_sub%val(89,m), var_scaling, len_scaling, ds
                                        
       deallocate (rf_scale_factor)   
 

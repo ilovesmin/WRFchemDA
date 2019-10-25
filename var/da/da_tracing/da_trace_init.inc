@@ -34,7 +34,7 @@ subroutine da_trace_init
             iostat=iostatus)    ! o:
       else   
          write(unit=temp,fmt='(i10)') myproc
-         tracefile="trace/"//trim(adjustl(temp))//".txt"
+         tracefile="trace"//trim(adjustl(temp))//".txt"
          open (&
             unit=trace_unit, &   ! i:
             file=trim(tracefile), &   ! i:

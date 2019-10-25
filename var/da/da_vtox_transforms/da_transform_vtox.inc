@@ -65,23 +65,22 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp &
 #endif
    end if
 
-#if (WRF_CHEM == 1)
    !----------------------------------------------------------------------
    ! [2.0c]: Perform x = u_ch vch transform:
    !----------------------------------------------------------------------
-   if ( cv_options == 10 .and. present(vch)) then
+#if (WRF_CHEM == 1)
+   if ( cv_options == 10 .and. present(vch)) then  ! for emission - JJ
       call da_transform_vchtox(grid, vch, be)
    else
+
+   if (chem_cv_options >= 1 .and. present(vchem)) then
+      call da_transform_vchemtox(grid, vchem, be)
+   end if
 #endif
 
    !----------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
    !----------------------------------------------------------------------
-
-!   if (chem_cv_options ==1 .and. present(vchem) .and. iv%info(chemic_surf)%nlocal > 0) then
-   if (chem_cv_options ==1 .and. present(vchem)) then
-      call da_transform_vchemtox(grid, vchem, be)
-   end if
 
    if (  cv_options == 3 ) then
 
@@ -127,7 +126,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp &
    end if
 #endif
 
-   end if
+   end if  !  if (  cv_options == 3 ) then
    
    if (trace_use) call da_trace_exit("da_transform_vtox")
 

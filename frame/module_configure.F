@@ -245,6 +245,7 @@ CONTAINS
 !      nbytes = loc(model_config_rec%last_item_in_struct) - &
 !               loc(model_config_rec%first_item_in_struct)
       IF ( nbytes .gt. buflen ) THEN
+        write(*,*) 'frame/module_configure.F: nbyptes, buflen =', nbyptes, buflen
         CALL wrf_error_fatal( &
         "get_config_rec_as_buffer: buffer size too small for config_rec" )
       ENDIF

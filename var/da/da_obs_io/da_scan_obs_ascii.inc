@@ -64,7 +64,7 @@ subroutine da_scan_obs_ascii (iv, filename, grid)
 
    if (iost /= 0) then
       write(unit=message(1),fmt='(A,I5,A)') &
-         "Error",iost," opening gts obs file "//trim(filename)
+         "istatus = ",iost,": cannot open gts obs file "//trim(filename)
       call da_warning(__FILE__,__LINE__,message(1:1))
       call da_free_unit(iunit)
       if (trace_use) call da_trace_exit("da_scan_obs_ascii")

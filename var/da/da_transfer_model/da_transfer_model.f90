@@ -18,10 +18,42 @@ module da_transfer_model
 
 #if (WRF_CHEM == 1)
    use module_state_description, only : num_chem_surf, num_chem_acft, num_scaleant, &
-      num_scalebb, PARAM_FIRST_SCALAR, num_chem, p_bc2, p_oc2, p_co, p_no2, p_o3, p_so2, &
-      p_p10, p_p25, p_sulf, &
-      p_chem_ic_bc2, p_chem_ic_oc2, p_chem_ic_co, p_chem_ic_no2, p_chem_ic_o3, p_chem_ic_so2, &
-      p_chem_ic_p10, p_chem_ic_p25, p_chem_ic_sulf
+      num_scalebb, PARAM_FIRST_SCALAR, num_chem, &
+!      num_scalebb, PARAM_FIRST_SCALAR, num_chem, p_bc1, p_bc2, p_oc1, p_oc2, &
+!      p_p10, p_p25, p_sulf, p_dust_1, p_dust_2, p_dust_3, p_dust_4, &
+!      p_seas_1, p_seas_2, p_seas_3, p_seas_4, &
+      p_co, p_no2, p_o3, p_so2, &
+!      p_chem_ic_p10, p_chem_ic_p25, p_chem_ic_sulf , &
+!      p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2, &
+!      p_chem_ic_dust_1, p_chem_ic_dust_2, p_chem_ic_dust_3, p_chem_ic_dust_4, &
+!      p_chem_ic_seas_1, p_chem_ic_seas_2, p_chem_ic_seas_3, p_chem_ic_seas_4, &
+      p_chem_ic_co, p_chem_ic_no2, p_chem_ic_o3, p_chem_ic_so2, &
+!      p_bc_a01, p_bc_a02, p_bc_a03, p_oc_a01, p_oc_a02, p_oc_a03,  &
+!      p_so4_a01, p_so4_a02, p_so4_a03, p_no3_a01, p_no3_a02, p_no3_a03,  &
+!      p_nh4_a01, p_nh4_a02, p_nh4_a03, p_cl_a01, p_cl_a02, p_cl_a03,  &
+!      p_na_a01, p_na_a02, p_na_a03, p_oin_a01, p_oin_a02, p_oin_a03,  &
+!      p_chem_ic_bc_a01, p_chem_ic_bc_a02, p_chem_ic_bc_a03, p_chem_ic_oc_a01, p_chem_ic_oc_a02, p_chem_ic_oc_a03, &
+!      p_chem_ic_so4_a01, p_chem_ic_so4_a02, p_chem_ic_so4_a03, p_chem_ic_no3_a01, p_chem_ic_no3_a02, p_chem_ic_no3_a03, &
+!      p_chem_ic_nh4_a01, p_chem_ic_nh4_a02, p_chem_ic_nh4_a03, p_chem_ic_cl_a01, p_chem_ic_cl_a02, p_chem_ic_cl_a03, &
+!      p_chem_ic_na_a01, p_chem_ic_na_a02, p_chem_ic_na_a03, p_chem_ic_oin_a01, p_chem_ic_oin_a02, p_chem_ic_oin_a03, &
+      p_so4aj,  p_so4ai,  p_nh4aj,  p_nh4ai,  &   ! aerosol species in racm_soa_vbs_kpp
+      p_no3aj,  p_no3ai,  p_naaj,   p_naai,   &
+      p_asoa1j, p_asoa1i, p_asoa2j, p_asoa2i, &
+      p_asoa3j, p_asoa3i, p_asoa4j, p_asoa4i, &
+      p_bsoa1j, p_bsoa1i, p_bsoa2j, p_bsoa2i, &
+      p_bsoa3j, p_bsoa3i, p_bsoa4j, p_bsoa4i, &
+      p_orgpaj, p_orgpai, p_ecj,    p_eci,    &
+      p_p25j,   p_p25i,   p_antha,  p_seas,   &
+      p_claj,   p_clai,   p_soila,            &
+      p_chem_ic_so4aj,  p_chem_ic_so4ai,  p_chem_ic_nh4aj,  p_chem_ic_nh4ai,  &   ! aerosol species in racm_soa_vbs_da
+      p_chem_ic_no3aj,  p_chem_ic_no3ai,  p_chem_ic_naaj,   p_chem_ic_naai,   &
+      p_chem_ic_asoa1j, p_chem_ic_asoa1i, p_chem_ic_asoa2j, p_chem_ic_asoa2i, &
+      p_chem_ic_asoa3j, p_chem_ic_asoa3i, p_chem_ic_asoa4j, p_chem_ic_asoa4i, &
+      p_chem_ic_bsoa1j, p_chem_ic_bsoa1i, p_chem_ic_bsoa2j, p_chem_ic_bsoa2i, &
+      p_chem_ic_bsoa3j, p_chem_ic_bsoa3i, p_chem_ic_bsoa4j, p_chem_ic_bsoa4i, &
+      p_chem_ic_orgpaj, p_chem_ic_orgpai, p_chem_ic_ecj,    p_chem_ic_eci,    &
+      p_chem_ic_p25j,   p_chem_ic_p25i,   p_chem_ic_antha,  p_chem_ic_seas,   &
+      p_chem_ic_claj,   p_chem_ic_clai,   p_chem_ic_soila
 #endif
 
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals

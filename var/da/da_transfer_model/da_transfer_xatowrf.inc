@@ -19,11 +19,9 @@ subroutine da_transfer_xatowrf(grid, config_flags)
    !
    !---------------------------------------------------------------------------
 
-   USE module_state_description, ONLY :                                 &
-                     num_chem                                           & !inline gocart
-                    ,p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2                         & !inline gocart
-                    ,p_chem_ic_so2, p_chem_ic_no2, p_chem_ic_o3, p_chem_ic_co      &
-                    ,p_chem_ic_p10,  p_chem_ic_p25,  p_chem_ic_sulf
+#if (WRF_CHEM == 1)
+   USE module_state_description, ONLY : num_chem
+#endif
 
    implicit none
 
@@ -57,6 +55,7 @@ subroutine da_transfer_xatowrf(grid, config_flags)
    logical :: has_lsm_info
 
    if (trace_use) call da_trace_entry("da_transfer_xatowrf")
+   print*, 'da_transfer_xatowrf'
 
    has_lsm_info = .false.
    if ( grid%sf_surface_physics == 2 ) then
@@ -712,6 +711,7 @@ subroutine da_transfer_xatowrf(grid, config_flags)
       grid%moist_btxe = grid%moist_btxe + model_grid%g_moist_btxe
       grid%moist_btys = grid%moist_btys + model_grid%g_moist_btys
       grid%moist_btye = grid%moist_btye + model_grid%g_moist_btye
+#endif
 
 #if (WRF_CHEM == 1)
       ! Don't ever want scale < 0; alpha < 0 is no problem
@@ -736,29 +736,23 @@ subroutine da_transfer_xatowrf(grid, config_flags)
       end do
 #endif
 
-#else !! not var4d !!
-
 #if (WRF_CHEM == 1)
-!!!      do ic = 1, num_chem-1
       do ic = PARAM_FIRST_SCALAR, num_chem
          do j=jts,jte
             do i=its,ite
                do k=kts, kte
-!!!                  grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic)
-!!!                  grid%chem(i,j,k,ic) = max(grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic), 0.0)
-			if (grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic).lt.0.0) then
-	                  grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic)
-			else
-	                  grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic)
-			end if
+                  ! Negative chem species are not allowed. If so, just keep the background value.
+		  if (grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic).lt.0.0) then
+	              grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic)
+		  else
+	              grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic)
+		  end if
                end do
             end do
          end do
       end do
-
 #endif
 
-#endif
 
    if (trace_use) call da_trace_exit("da_transfer_xatowrf")
 

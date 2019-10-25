@@ -16,6 +16,8 @@ subroutine da_transfer_wrftoxb_gocart(grid)
    integer :: ic, i, j, k, ij
 
    if (trace_use) call da_trace_entry("da_transfer_wrftoxb_gocart")
+   print*,'da_transfer_wrftoxb_gocart: PARAM_FIRST_SCALAR, num_chem =',&
+                                       PARAM_FIRST_SCALAR, num_chem
 
    !$OMP PARALLEL DO &
    !$OMP PRIVATE ( ic, ij, i, j, k )

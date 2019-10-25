@@ -19,7 +19,7 @@ subroutine da_transform_vchemtox(grid, vchem, be)
    !$OMP PARALLEL DO &
    !$OMP PRIVATE ( ij, ic, m, n, j, i, temp )
 
-         grid%xachem%chem_ic = 0.D0
+   grid%xachem%chem_ic = 0.D0
 
    do ij = 1 , grid%num_tiles
       do ic = PARAM_FIRST_SCALAR, num_chem

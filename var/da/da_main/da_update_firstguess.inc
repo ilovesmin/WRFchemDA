@@ -1306,9 +1306,6 @@ end if
 !The code can be modified if chem IC for gocart are already present in the original wrfinput file,
 ! but should not need to be. -Wei Sun 02/2019
 if ( use_chemic_surfobs ) then
-!
-!  write scaleant members
-!
 
   p => grid%head_statevars
   varname = ''

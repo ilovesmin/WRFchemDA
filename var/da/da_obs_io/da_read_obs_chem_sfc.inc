@@ -4,7 +4,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
    ! Purpose:        Read surface chem IC observation files
    !
    ! History: 03/2019  Creation (Wei Sun)
-   !
+   !          08/2019  Remove dependency on the namelist option (Soyoung Ha)
    !-------------------------------------------------------------------------
 
    implicit none
@@ -13,6 +13,11 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
    character(len=*),  intent(in)    :: filename
    type(domain),     intent(in)     :: grid     ! first guess state.
 
+   ! Maximum threshold for absolute innovation values - treat as missing above this value
+   real, parameter              :: max_pm = 300.
+   real                         :: pm25, pm10, so2, no2, o3, co
+
+   character (len =   6)        :: SiteID 
    character (len =  10)        :: fmt_name
 
    character (len = 160)        :: info_string
@@ -33,7 +38,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
    integer                      :: ndup, n, report, obs_index
 
    real*8                       :: obs_time, analysis_time
-   integer                      :: iyear, imonth, iday, ihour, imin
+   integer                      :: iyear, imonth, iday, ihour, imin, isite
    real                         :: tdiff, dlat_earth,dlon_earth,crit
    integer                      :: itt,itx,iout
    real, allocatable            :: in(:), out(:)
@@ -67,7 +72,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
 
    if (iost /= 0) then
       write(unit=message(1),fmt='(A,I5,A)') &
-         "Error",iost," opening chemic obs file "//trim(filename)
+         "Error",iost," opening chem sfc obs file "//trim(filename)
       call da_warning(__FILE__,__LINE__,message(1:1))
       call da_free_unit(iunit)
       if (trace_use) call da_trace_exit("da_read_obs_chem_sfc")
@@ -76,6 +81,11 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
 
    allocate ( platform%chem (num_chemic_surf) )
    obs_index = chemic_surf
+
+   write(*,*) "da_read_obs_chem_sfc: pm obs are treated as missing if >= ", max_pm
+   write(*,*) "da_read_obs_chem_sfc: num_chemic_surf, chemic_surf =", num_chemic_surf,chemic_surf
+
+   imin=0    ! minutes
 
    ! loop over records
    ! -----------------
@@ -87,35 +97,91 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
 
       report = report+1
 
+      ! Initialization
+      ! =============================
+      platform%chem(:)%inv = missing_r 
+      platform%chem(:)%qc  = missing
+      platform%chem(:)%error = missing_r
+
       ! read station general info
       ! =============================
 
-!!!      platform%each (1) = chemic_surf_type(missing_r, missing, -1.0, & ! height
-!!!       field_type(missing_r, missing, missing_r, missing, missing_r))
+      read (iunit, fmt='(A6,F10.6,1X,F10.6,1X,I4,3I2,2F9.1,3F9.3,F9.1)', iostat=iost)  &
+            SiteID,                                   &
+            platform%info%lat,                        &
+            platform%info%lon,                        &
+            iyear, imonth, iday, ihour,               &
+            pm25,  pm10,   so2,  no2,   o3, co
 
-         platform%chem(:)%inv = missing_r 
-         platform%chem(:)%qc  = missing
-         platform%chem(:)%error = missing_r
+      platform%info%id = trim(SiteID)
+      read(SiteID,'(I6)') isite
 
-      read (iunit, *, iostat =  iost)  &
-         platform%info%id,                 &
-         platform%info%lat,                &
-         platform%info%lon,                &
-         platform%info%date_char,          &
-         platform%chem(PARAM_FIRST_SCALAR)%inv,    &  !!! pm10 !!!
-         platform%chem(PARAM_FIRST_SCALAR)%inv        !!! pm25 !!!
-!!!         platform%chem(PARAM_FIRST_SCALAR+1)%inv
+      write (platform%info%date_char,'(i4,3(i2.2))')  iyear, imonth, iday, ihour
+      !write (platform%info%date_char,'(i4,A1,2(I2,A1),I2,A6)')  &
+      !      iyear, '-', imonth, '-', iday, '_', ihour, ':00:00'
+
           
-!!!      if (platform%chem(PARAM_FIRST_SCALAR)%inv==-999.or.platform%chem(PARAM_FIRST_SCALAR)%inv>=500) then
-      if (platform%chem(PARAM_FIRST_SCALAR)%inv==-999.or.platform%chem(PARAM_FIRST_SCALAR)%inv>=100) then
-         platform%chem(PARAM_FIRST_SCALAR)%inv=missing_r
-      else
-         platform%chem(PARAM_FIRST_SCALAR)%qc=333
-      end if
-!!!      if (platform%chem(PARAM_FIRST_SCALAR+1)%inv==-999) platform%chem(PARAM_FIRST_SCALAR)%inv=missing_r 
+      !!!!!!!!!!!!!!!!!!!
+      ! FIXME: Unit should be consistent; Chinese data has ug/m3, but Korean data has ppm for chem species.
+      !!!!!!!!!!!!!!!!!!!
 
-      read (platform%info%date_char,'(i4,3(i2))')  iyear, imonth, iday, ihour
-      imin=0
+      select case ( chemicda_opt )
+      case ( 1 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
+            platform%info%name                      = "pm25"
+      case ( 2 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = pm10
+            platform%info%name                      = "pm10"
+      case ( 3 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
+            platform%chem(PARAM_FIRST_SCALAR+1)%inv = pm10
+            platform%info%name                      = "all_pm"
+      case ( 4 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
+            platform%chem(PARAM_FIRST_SCALAR+1)%inv = pm10
+            platform%chem(PARAM_FIRST_SCALAR+2)%inv = so2
+            platform%chem(PARAM_FIRST_SCALAR+3)%inv = no2
+            platform%chem(PARAM_FIRST_SCALAR+4)%inv = o3
+            platform%chem(PARAM_FIRST_SCALAR+5)%inv = co
+            if(isite < 10000) & ! co at Chinese sites
+            platform%chem(PARAM_FIRST_SCALAR+5)%inv = platform%chem(PARAM_FIRST_SCALAR+5)%inv*1000 !!! mg to ug !!! 
+            platform%info%name                      = "all"
+      case ( 5 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = so2
+            platform%chem(PARAM_FIRST_SCALAR+1)%inv = no2
+            platform%chem(PARAM_FIRST_SCALAR+2)%inv = o3
+            platform%chem(PARAM_FIRST_SCALAR+3)%inv = co
+            if(isite < 10000) & ! co at Chinese sites
+            platform%chem(PARAM_FIRST_SCALAR+3)%inv = platform%chem(PARAM_FIRST_SCALAR+3)%inv*1000 !!! mg to ug !!! 
+            platform%info%name                      = "all_gas"
+      case ( 6 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = so2 
+            platform%info%name                      = "so2"
+      case ( 7 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = no2 
+            platform%info%name                      = "no2"
+      case ( 8 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = o3
+            platform%info%name                      = "o3"
+      case ( 9 )
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = co 
+            platform%info%name                      = "co"
+            if(isite < 10000) & ! co at Chinese sites
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = platform%chem(PARAM_FIRST_SCALAR  )%inv*1000 !!! mg to ug !!! 
+      case default
+            platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
+            platform%info%name                      = ""
+      end select
+
+      ! Sanity check
+      !!!!!!!!!!!!!!!!!!!
+      do ichem = PARAM_FIRST_SCALAR, num_chemic_surf
+      if (platform%chem(ichem)%inv==-999.or.abs(platform%chem(ichem)%inv)>=max_pm) then
+          platform%chem(ichem)%inv=missing_r
+      else
+          platform%chem(ichem)%qc = 0
+      endif
+      end do
 
       if (iost /= 0) then
          ! FIX? This is expected, but its unclear how we handle failure
@@ -133,15 +199,11 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       ! read model location
       ! =========================
 
-!!!      read (iunit, fmt = fmt_srfc)  &
-!!!         platform%loc%slp%inv, platform%loc%slp%qc, platform%loc%slp%error, &
-!!!         platform%loc%pw%inv, platform%loc%pw%qc, platform%loc%pw%error
-
       ! Check if outside of the time range:
 
       call da_get_julian_time (iyear,imonth,iday,ihour,imin,obs_time)
       if ( obs_time < time_slots(0) .or. &
-           obs_time >= time_slots(num_fgat_time) ) then
+           obs_time > time_slots(num_fgat_time) ) then
          if (print_detail_obs) then
            write(unit=stdout, fmt='(a)') '*** Outside of the time range:'
            write(unit=stdout, fmt=fmt_info) &
@@ -176,9 +238,10 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       if (print_detail_obs) then
          ! Simplistic approach, could be improved to get it all done on PE 0
          if (.NOT. outside) then
-            write(unit=stdout,fmt='(A,I5,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
+            write(unit=stdout,fmt='(A,I5,A,F8.2,A,F8.2,A,I3,A,2F8.2,5x,F12.1)') &
                "Report",report," at",platform%info%lon,"E",platform%info%lat, &
-               "N on processor", myproc,", position", platform%loc%x,platform%loc%y
+               "N on processor", myproc,", position", platform%loc%x,platform%loc%y, &
+               platform%chem(PARAM_FIRST_SCALAR)%inv !, pm25
          end if
       end if
 
@@ -224,7 +287,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       dup_loop: do n = 1, ndup
          is_surface=.true.
          if (use_chemic_surfobs) then
-            if (.not. use_chemic_surfobs .or. ntotal(chemic_surf) == max_synop_input  ) cycle reports
+            if (ntotal(chemic_surf) == max_synop_input  ) cycle reports
             if (n==1) ntotal(chemic_surf) = ntotal(chemic_surf)+1
             if (outside) cycle reports
             if ( thin_conv_ascii ) then
@@ -236,12 +299,12 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
                ilocal(chemic_surf) = ilocal(chemic_surf) + 1
             end if
 
-
-        allocate ( iv%chemic_surf(ilocal(chemic_surf))%chem(num_chemic_surf))
+            allocate ( iv%chemic_surf(ilocal(chemic_surf))%chem(num_chemic_surf))
 
             do ichem = PARAM_FIRST_SCALAR, num_chemic_surf
                 iv%chemic_surf(ilocal(chemic_surf))%chem(ichem) = platform%chem(ichem)
             end do
+
 	 else
 
             write(unit=message(1), fmt='(a)') 'unsaved obs found:'
@@ -343,6 +406,12 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
          deallocate( out )
       end do ! loop over num_ob_indexes
    end if  ! thin_conv_ascii
+ 
+   print*,'da_read_obs_chem_sfc:chemic_surf,ilocal(chemic_surf),ntotal(chemic_surf)=',&
+                                chemic_surf,ilocal(chemic_surf),ntotal(chemic_surf)
+   print*,'da_read_obs_chem_sfc:num_ob_indexes,nlocal(num_ob_indexes),ntotal(num_ob_indexes)=',&
+                                num_ob_indexes,nlocal(num_ob_indexes),ntotal(num_ob_indexes)
+
    if (trace_use) call da_trace_exit("da_read_obs_chem_sfc")
 
 end subroutine da_read_obs_chem_sfc

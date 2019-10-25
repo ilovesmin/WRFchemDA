@@ -38,30 +38,24 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv &
    else
 
 #if (WRF_CHEM == 1)
-   if ( cv_options == 10 .and. present(vch) ) then
-   !----------------------------------------------------------------------
-   ! [2.0c]: Perform x = u_ch vch transform:
-   !----------------------------------------------------------------------
+      if ( cv_options == 10 .and. present(vch) ) then   ! for emission - JJ
+      !----------------------------------------------------------------------
+      ! [2.0c]: Perform x = u_ch vch transform:
+      !----------------------------------------------------------------------
+       call da_zero_xch_type (vch)
+       call da_transform_vchtox_adj(grid, vch, be)
 
-    call da_zero_xch_type (vch)
-    call da_transform_vchtox_adj(grid, vch, be)
+      else if ( chem_cv_options >= 1 .and. present(vchem) ) then
 
-   else if ( chem_cv_options == 1 .and. present(vchem) ) then
-      call da_zero_xchem_type (vchem)
-      call da_transform_vchemtox_adj(grid, vchem, be)    
-	write(*,*) 'chk options222'
-   else
+         call da_zero_xchem_type (vchem)
+         call da_transform_vchemtox_adj(grid, vchem, be)   
+
+      else  
 #endif
-
+ 
    !-------------------------------------------------------------------------
    ! [3.0]: Perform x = u_p vp transform::
    !-------------------------------------------------------------------------
-
-!   if ( chem_cv_options == 1 .and. present(vchem)) then
-!      call da_zero_xchem_type (vchem)
-!      call da_transform_vchemtox_adj(grid, vchem, be)
-!	write(*,*) 'chk options'
-!   end if
 
    !zero out vp outside this subroutine in order for vp%alpha to pass in
    !call da_zero_vp_type (vp)
@@ -102,13 +96,12 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv &
          vv % alpha(its_int:ite_int,jts_int:jte_int,kts_int:kte_int,1:be%ne) = & 
          vp % alpha(its_int:ite_int,jts_int:jte_int,kts_int:kte_int,1:be%ne)
       end if
-   end if
+   end if  !  if (vert_corr == 2) then      
 
 #if (WRF_CHEM == 1)
-   end if
+      end if
 #endif
-
-   end if
+   end if  !  if (  cv_options == 3 ) then
 
    !-------------------------------------------------------------------------
    ! [1.0]: perform vv = u_h cv transform:
@@ -125,13 +118,13 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv &
          call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vchem=vchem)
         else if (present(vch)) then
          call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vch=vch)
-      else
+        else
 #endif
          call da_transform_vtovv_adj(grid, cv_size, be, cv, vv)
 #if (WRF_CHEM == 1)
-      end if
+        end if
 #endif
-   end if
+   end if  ! if (global) then
 
    if (trace_use) call da_trace_exit("da_transform_vtox_adj")
 

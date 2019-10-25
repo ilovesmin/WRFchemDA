@@ -36,15 +36,26 @@ module da_obs_io
 
 #if (WRF_CHEM == 1)
    use da_control, only : num_ts, num_surf_obs, num_acft_obs, num_platform, chem_surf, chem_acft, &
-      use_chem_surfobs, use_chem_acftobs, time_step, chemic_surf, use_chemic_surfobs
+      use_chem_surfobs, use_chem_acftobs, time_step, chemic_surf, use_chemic_surfobs, chem_cv_options, chemicda_opt 
    use module_state_description, only : num_chem_surf, num_chem_acft, num_chemic_surf, param_first_scalar, &
              num_chem, num_chem_ic 
    use module_dm, only : wrf_dm_sum_reals
    use da_define_structures, only : singl_level_type, chemic_surf_type
-   use module_state_description, only : p_chemsi_pm25, p_chemsi_pm10, &
-      p_chem_ic_p25, p_chem_ic_p10, p_chem_ic_sulf, p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2, &
-      p_chem_ic_dust_1, p_chem_ic_dust_2, p_chem_ic_dust_3, p_chem_ic_dust_4, &
-      p_chem_ic_seas_1, p_chem_ic_seas_2, p_chem_ic_seas_3, p_chem_ic_seas_4
+   use module_state_description, only :   p_chemsi_pm25,    p_chemsi_pm10,    &   ! chemic_surf for chemicda_opt
+      p_chemsi_so2,     p_chemsi_no2,     p_chemsi_o3,      p_chemsi_co,      &   ! chemic_surf for chemicda_opt
+      p_chem_ic_so2,    p_chem_ic_no2,    p_chem_ic_o3,     p_chem_ic_co,     &   ! chem (gas) species
+      p_chem_ic_so4aj,  p_chem_ic_so4ai,  p_chem_ic_nh4aj,  p_chem_ic_nh4ai,  &   ! chem (aerosol) species in racm_soa_vbs_da
+      p_chem_ic_no3aj,  p_chem_ic_no3ai,  p_chem_ic_naaj,   p_chem_ic_naai,   &
+      p_chem_ic_asoa1j, p_chem_ic_asoa1i, p_chem_ic_asoa2j, p_chem_ic_asoa2i, &
+      p_chem_ic_asoa3j, p_chem_ic_asoa3i, p_chem_ic_asoa4j, p_chem_ic_asoa4i, &
+      p_chem_ic_bsoa1j, p_chem_ic_bsoa1i, p_chem_ic_bsoa2j, p_chem_ic_bsoa2i, &
+      p_chem_ic_bsoa3j, p_chem_ic_bsoa3i, p_chem_ic_bsoa4j, p_chem_ic_bsoa4i, &
+      p_chem_ic_orgpaj, p_chem_ic_orgpai, p_chem_ic_ecj,    p_chem_ic_eci,    &
+      p_chem_ic_p25j,   p_chem_ic_p25i,   p_chem_ic_antha,  p_chem_ic_seas,   &
+      p_chem_ic_claj,   p_chem_ic_clai,   p_chem_ic_soila
+!      p_chem_ic_p25, p_chem_ic_p10, p_chem_ic_sulf, p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2, &
+!      p_chem_ic_dust_1, p_chem_ic_dust_2, p_chem_ic_dust_3, p_chem_ic_dust_4, &
+!      p_chem_ic_seas_1, p_chem_ic_seas_2, p_chem_ic_seas_3, p_chem_ic_seas_4
 #endif
 
    use da_define_structures, only : iv_type, multi_level_type, multi_level_type_BUFR, &
@@ -97,6 +108,7 @@ contains
 #include "da_scan_obs_chem_sfc.inc"
 #include "da_write_obs_chem_sfc.inc"
 #include "da_final_write_obs_chem_sfc.inc"
+#include "da_final_write_obs_gas_sfc.inc"
 #endif
 #include "da_read_errfac.inc"
 #include "da_use_obs_errfac.inc"

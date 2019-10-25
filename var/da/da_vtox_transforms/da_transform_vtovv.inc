@@ -284,7 +284,7 @@ subroutine da_transform_vtovv(grid, cv_size, be, cv, vv &
                                                 be % v12 (ic-1) % val, &
                                                 vchem % chem_ic (:,:,:,ic))
 
-     elseif( .not. use_rf ) then
+      elseif( .not. use_rf ) then
          call da_error(__FILE__,__LINE__,(/"no da_transform_through_wavelet for chem_ic"/))
       endif
    end do

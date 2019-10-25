@@ -4,10 +4,28 @@ subroutine da_analysis_stats  (grid, stats_unit, stats_unit2)
    ! Purpose: Calculate min, max, mean and RMS of input 1d field.
    !------------------------------------------------------------------------
 #if (WRF_CHEM == 1)
-use module_state_description, only : num_chem, PARAM_FIRST_SCALAR                   &
-                     ,p_chem_ic_p25,  p_chem_ic_sulf                                &
-                     ,p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2    &
-                     ,p_chem_ic_dust_1, p_chem_ic_dust_2, p_chem_ic_seas_1, p_chem_ic_seas_2
+use module_state_description, only : num_chem, PARAM_FIRST_SCALAR                  &
+!                     ,p_chem_ic_p25,  p_chem_ic_sulf                                &
+!                     ,p_chem_ic_bc1, p_chem_ic_bc2, p_chem_ic_oc1, p_chem_ic_oc2    &
+!                     ,p_chem_ic_dust_1, p_chem_ic_dust_2, p_chem_ic_seas_1, p_chem_ic_seas_2  &
+!                     ,p_chem_ic_bc_a01, p_chem_ic_bc_a02, p_chem_ic_bc_a03    &
+!                     ,p_chem_ic_oc_a01, p_chem_ic_oc_a02, p_chem_ic_oc_a03    &
+!                     ,p_chem_ic_so4_a01, p_chem_ic_so4_a02, p_chem_ic_so4_a03    &
+!                     ,p_chem_ic_no3_a01, p_chem_ic_no3_a02, p_chem_ic_no3_a03    &
+!                     ,p_chem_ic_nh4_a01, p_chem_ic_nh4_a02, p_chem_ic_nh4_a03    &
+!                     ,p_chem_ic_cl_a01, p_chem_ic_cl_a02, p_chem_ic_cl_a03    &
+!                     ,p_chem_ic_na_a01, p_chem_ic_na_a02, p_chem_ic_na_a03    &
+!                     ,p_chem_ic_oin_a01, p_chem_ic_oin_a02, p_chem_ic_oin_a03 &
+                     ,p_chem_ic_so4aj,  p_chem_ic_so4ai,  p_chem_ic_nh4aj,  p_chem_ic_nh4ai,  &
+                      p_chem_ic_no3aj,  p_chem_ic_no3ai,  p_chem_ic_naaj,   p_chem_ic_naai,   &
+                      p_chem_ic_claj,   p_chem_ic_clai, &
+                      p_chem_ic_asoa1j, p_chem_ic_asoa1i, p_chem_ic_asoa2j, p_chem_ic_asoa2i, &
+                      p_chem_ic_asoa3j, p_chem_ic_asoa3i, p_chem_ic_asoa4j, p_chem_ic_asoa4i, &
+                      p_chem_ic_bsoa1j, p_chem_ic_bsoa1i, p_chem_ic_bsoa2j, p_chem_ic_bsoa2i, &
+                      p_chem_ic_bsoa3j, p_chem_ic_bsoa3i, p_chem_ic_bsoa4j, p_chem_ic_bsoa4i, &
+                      p_chem_ic_orgpaj, p_chem_ic_orgpai, p_chem_ic_ecj,    p_chem_ic_eci,    &
+                      p_chem_ic_p25j,   p_chem_ic_p25i,   p_chem_ic_antha,  p_chem_ic_seas,   &
+                      p_chem_ic_soila,  p_chem_ic_so2,    p_chem_ic_no2,    p_chem_ic_o3,     p_chem_ic_co
 #endif
 
    implicit none
@@ -99,7 +117,7 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 #if (WRF_CHEM == 1)
       write(unit=stats_unit2, fmt='(/a/)') ' Minimum of gridded analysis increments'
       select case ( chem_cv_options )
-       case ( 1 )
+       case ( 112 )
           write(unit=stats_unit2, fmt='(11a/)') &
                ' Lvl         ', &
                'p25      i    j          ', &
@@ -112,6 +130,17 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
                'dust_2   i    j          ', &
                'seas_1   i    j          ', &
                'seas_2   i    j'
+       case ( 108 )
+          write(unit=stats_unit2, fmt='(9a/)') &
+               ' Lvl, so4aj i j, so4ai i j, nh4aj i j, nh4ai i j, no3aj i j,', &
+               'no3ai  i j, naaj i j, naai i j, claj i j, clai i j,', &
+               'asoa1j i j, asoa1i i j, asoa2j i j, asoa2i i j, ', &
+               'asoa3j i j, asoa3i i j, asoa4j i j, asoa4i i j,', &
+               'bsoa1j i j, bsoa1i i j, bsoa2j i j, bsoa2i i j, ', &
+               'bsoa3j i j, bsoa3i i j, bsoa4j i j, bsoa4i i j,', &
+               'orgpaj i j, orgpai i j, ecj i j,    eci i j,', &
+               'p25j   i j,   p25i i j, antha  i j, seas   i j, soila i j,', &
+               'so2 i j,    no2 i j,    o3 i j,     co i j'
       end select
 #endif
    end if
@@ -187,11 +216,33 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-            write(unit=stats_unit2, fmt='(i4,4(f12.4,2i5),6(e12.4,2i5))') k, &
-               min_chem(k, p_chem_ic_p25), min_chem(k, p_chem_ic_sulf), &
-               min_chem(k, p_chem_ic_bc1), min_chem(k, p_chem_ic_bc2), min_chem(k, p_chem_ic_oc1), min_chem(k, p_chem_ic_oc2), &
-               min_chem(k, p_chem_ic_dust_1), min_chem(k, p_chem_ic_dust_2), min_chem(k, p_chem_ic_seas_1), min_chem(k, p_chem_ic_seas_1)
+         !case ( 112 )   ! mozcart_da
+         !   write(unit=stats_unit2, fmt='(i4,4(f12.4,2i5),6(e12.4,2i5))') k, &
+         !      min_chem(k, p_chem_ic_p25), min_chem(k, p_chem_ic_sulf), &
+         !      min_chem(k, p_chem_ic_bc1), min_chem(k, p_chem_ic_bc2), min_chem(k, p_chem_ic_oc1), min_chem(k, p_chem_ic_oc2), &
+         !      min_chem(k, p_chem_ic_dust_1), min_chem(k, p_chem_ic_dust_2), min_chem(k, p_chem_ic_seas_1), min_chem(k, p_chem_ic_seas_1)
+         case ( 108 )     ! racm_soa_vbs_da
+            write(unit=stats_unit2, fmt='(i4,39(f12.4,2i5))') k, &
+               min_chem(k, p_chem_ic_so4aj),  min_chem(k, p_chem_ic_so4ai),  min_chem(k, p_chem_ic_nh4aj),  min_chem(k, p_chem_ic_nh4ai), &
+               min_chem(k, p_chem_ic_no3aj),  min_chem(k, p_chem_ic_no3ai),  min_chem(k, p_chem_ic_naaj),   min_chem(k, p_chem_ic_naai),  &
+               min_chem(k, p_chem_ic_asoa1j), min_chem(k, p_chem_ic_asoa1i), min_chem(k, p_chem_ic_asoa2j), min_chem(k, p_chem_ic_asoa2i), &
+               min_chem(k, p_chem_ic_asoa3j), min_chem(k, p_chem_ic_asoa3i), min_chem(k, p_chem_ic_asoa4j), min_chem(k, p_chem_ic_asoa4i), &
+               min_chem(k, p_chem_ic_bsoa1j), min_chem(k, p_chem_ic_bsoa1i), min_chem(k, p_chem_ic_bsoa2j), min_chem(k, p_chem_ic_bsoa2i), &
+               min_chem(k, p_chem_ic_bsoa3j), min_chem(k, p_chem_ic_bsoa3i), min_chem(k, p_chem_ic_bsoa4j), min_chem(k, p_chem_ic_bsoa4i), &
+               min_chem(k, p_chem_ic_orgpaj), min_chem(k, p_chem_ic_orgpai), min_chem(k, p_chem_ic_ecj),    min_chem(k, p_chem_ic_eci),    &
+               min_chem(k, p_chem_ic_p25j),   min_chem(k, p_chem_ic_p25i),   min_chem(k, p_chem_ic_antha),  min_chem(k, p_chem_ic_seas),   &
+               min_chem(k, p_chem_ic_soila),  min_chem(k, p_chem_ic_claj),   min_chem(k, p_chem_ic_clai),  &
+               min_chem(k, p_chem_ic_so2),    min_chem(k, p_chem_ic_no2),    min_chem(k, p_chem_ic_o3),     min_chem(k, p_chem_ic_co)
+         !case ( 7 )     ! cbmz_mosaic_4bin_da
+         !   write(unit=stats_unit2, fmt='(i4,24f12.4)') k, &
+         !      min_chem(k, p_chem_ic_bc_a01), min_chem(k, p_chem_ic_bc_a02), min_chem(k, p_chem_ic_bc_a03), &
+         !      min_chem(k, p_chem_ic_oc_a01), min_chem(k, p_chem_ic_oc_a02), min_chem(k, p_chem_ic_oc_a03), &
+         !      min_chem(k, p_chem_ic_so4_a01), min_chem(k, p_chem_ic_so4_a02), min_chem(k, p_chem_ic_so4_a03), &
+         !      min_chem(k, p_chem_ic_no3_a01), min_chem(k, p_chem_ic_no3_a02), min_chem(k, p_chem_ic_no3_a03), &
+         !      min_chem(k, p_chem_ic_nh4_a01), min_chem(k, p_chem_ic_nh4_a02), min_chem(k, p_chem_ic_nh4_a03), &
+         !      min_chem(k, p_chem_ic_cl_a01), min_chem(k, p_chem_ic_cl_a02), min_chem(k, p_chem_ic_cl_a03), &
+         !      min_chem(k, p_chem_ic_na_a01), min_chem(k, p_chem_ic_na_a02), min_chem(k, p_chem_ic_na_a03), &
+         !      min_chem(k, p_chem_ic_oin_a01), min_chem(k, p_chem_ic_oin_a02), min_chem(k, p_chem_ic_oin_a03)
          end select
 #endif
       end if ! rootproc
@@ -233,10 +284,32 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
       select case ( chem_cv_options )
-      case ( 1 )
-          write(unit=stats_unit2, fmt='(a,4(f12.4,10x),6(e12.4,10x))') ' ALL', &
-             chemm(p_chem_ic_p25), chemm(p_chem_ic_sulf), chemm(p_chem_ic_bc1), chemm(p_chem_ic_bc2), chemm(p_chem_ic_oc1), &
-             chemm(p_chem_ic_oc2), chemm(p_chem_ic_dust_1), chemm(p_chem_ic_dust_2), chemm(p_chem_ic_seas_1), chemm(p_chem_ic_seas_2)
+      !case ( 112 )
+      !    write(unit=stats_unit2, fmt='(a,4(f12.4,10x),6(e12.4,10x))') ' ALL', &
+      !       chemm(p_chem_ic_p25), chemm(p_chem_ic_sulf), chemm(p_chem_ic_bc1), chemm(p_chem_ic_bc2), chemm(p_chem_ic_oc1), &
+      !       chemm(p_chem_ic_oc2), chemm(p_chem_ic_dust_1), chemm(p_chem_ic_dust_2), chemm(p_chem_ic_seas_1), chemm(p_chem_ic_seas_2)
+      case ( 108 )     ! racm_soa_vbs_da
+          write(unit=stats_unit2, fmt='(a,39(f12.4,5x))') ' ALL', &
+               chemm(p_chem_ic_so4aj),  chemm(p_chem_ic_so4ai),  chemm(p_chem_ic_nh4aj),  chemm(p_chem_ic_nh4ai), &
+               chemm(p_chem_ic_no3aj),  chemm(p_chem_ic_no3ai),  chemm(p_chem_ic_naaj),   chemm(p_chem_ic_naai),  &
+               chemm(p_chem_ic_asoa1j), chemm(p_chem_ic_asoa1i), chemm(p_chem_ic_asoa2j), chemm(p_chem_ic_asoa2i), &
+               chemm(p_chem_ic_asoa3j), chemm(p_chem_ic_asoa3i), chemm(p_chem_ic_asoa4j), chemm(p_chem_ic_asoa4i), &
+               chemm(p_chem_ic_bsoa1j), chemm(p_chem_ic_bsoa1i), chemm(p_chem_ic_bsoa2j), chemm(p_chem_ic_bsoa2i), &
+               chemm(p_chem_ic_bsoa3j), chemm(p_chem_ic_bsoa3i), chemm(p_chem_ic_bsoa4j), chemm(p_chem_ic_bsoa4i), &
+               chemm(p_chem_ic_orgpaj), chemm(p_chem_ic_orgpai), chemm(p_chem_ic_ecj),    chemm(p_chem_ic_eci),    &
+               chemm(p_chem_ic_p25j),   chemm(p_chem_ic_p25i),   chemm(p_chem_ic_antha),  chemm(p_chem_ic_seas),   &
+               chemm(p_chem_ic_soila),  chemm(p_chem_ic_claj),   chemm(p_chem_ic_clai),  &
+               chemm(p_chem_ic_so2),    chemm(p_chem_ic_no2),    chemm(p_chem_ic_o3),     chemm(p_chem_ic_co)
+      !case ( 7 )
+      !    write(unit=stats_unit2, fmt='(a,24(f12.4,10x))') ' ALL', &
+      !       chemm(p_chem_ic_bc_a01), chemm(p_chem_ic_bc_a02), chemm(p_chem_ic_bc_a03), &
+      !       chemm(p_chem_ic_oc_a01), chemm(p_chem_ic_oc_a02), chemm(p_chem_ic_oc_a03), &
+      !       chemm(p_chem_ic_so4_a01), chemm(p_chem_ic_so4_a02), chemm(p_chem_ic_so4_a03), &
+      !       chemm(p_chem_ic_no3_a01), chemm(p_chem_ic_no3_a02), chemm(p_chem_ic_no3_a03), &
+      !       chemm(p_chem_ic_nh4_a01), chemm(p_chem_ic_nh4_a02), chemm(p_chem_ic_nh4_a03), &
+      !       chemm(p_chem_ic_cl_a01), chemm(p_chem_ic_cl_a02), chemm(p_chem_ic_cl_a03), &
+      !       chemm(p_chem_ic_na_a01), chemm(p_chem_ic_na_a02), chemm(p_chem_ic_na_a03), &
+      !       chemm(p_chem_ic_oin_a01), chemm(p_chem_ic_oin_a02), chemm(p_chem_ic_oin_a03)
       end select
 #endif
 
@@ -246,19 +319,48 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 #if (WRF_CHEM == 1)
       write(unit=stats_unit2, fmt='(/a/)') ' Maximum of gridded analysis increments'
       select case ( chem_cv_options )
-       case ( 1 )
+       case ( 112 )
           write(unit=stats_unit2, fmt='(11a/)') &
                ' Lvl         ', &
-               'p25      i    j          ', &
-               'sulf     i    j          ', &
-               'bc1      i    j          ', &
-               'bc2      i    j          ', &
-               'oc1      i    j          ', &
-               'oc2      i    j          ', &
-               'dust_1   i    j          ', &
-               'dust_2   i    j          ', &
-               'seas_1   i    j          ', &
-               'seas_2   i    j'
+               'so4aj    i    j          ', &
+               'so4ai    i    j          ', &
+               'nh4aj    i    j          ', &
+               'nh4ai    i    j          ', &
+               'no3aj    i    j          ', &
+               'no3ai    i    j          ', &
+               'naaj     i    j          ', &
+               'naai     i    j          ', &
+               'claj     i    j          ', &
+               'clai     i    j          ', &
+               'asoa1j   i    j          ', &
+               'asoa1i   i    j          ', &
+               'asoa2j   i    j          ', &
+               'asoa2i   i    j          ', &
+               'asoa3j   i    j          ', &
+               'asoa3i   i    j          ', &
+               'asoa4j   i    j          ', &
+               'asoa4i   i    j          ', &
+               'bsoa1j   i    j          ', &
+               'bsoa1i   i    j          ', &
+               'bsoa2j   i    j          ', &
+               'bsoa2i   i    j          ', &
+               'bsoa3j   i    j          ', &
+               'bsoa3i   i    j          ', &
+               'bsoa4j   i    j          ', &
+               'bsoa4i   i    j          ', &
+               'orgpaj   i    j          ', &
+               'orgpai   i    j          ', &
+               'ecj      i    j          ', &
+               'eci      i    j          ', &
+               'p25j     i    j          ', &
+               'p25i     i    j          ', &
+               'antha    i    j          ', &
+               'seas     i    j          ', &
+               'soila    i    j          ', &
+               'so2      i    j          ', &
+               'no2      i    j          ', &
+               'o3       i    j          ', &
+               'co       i    j'
       end select
 #endif
 
@@ -316,11 +418,33 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-            write(unit=stats_unit2, fmt='(i4,4(f12.4,2i5),6(e12.4,2i5))') k, &
-               max_chem(k, p_chem_ic_p25), max_chem(k, p_chem_ic_sulf), &
-               max_chem(k, p_chem_ic_bc1), max_chem(k, p_chem_ic_bc2), max_chem(k, p_chem_ic_oc1), max_chem(k, p_chem_ic_oc2), &
-               max_chem(k, p_chem_ic_dust_1), max_chem(k, p_chem_ic_dust_2), max_chem(k, p_chem_ic_seas_1), max_chem(k, p_chem_ic_seas_1)
+         !case ( 112 )
+         !   write(unit=stats_unit2, fmt='(i4,4(f12.4,2i5),6(e12.4,2i5))') k, &
+         !      max_chem(k, p_chem_ic_p25), max_chem(k, p_chem_ic_sulf), &
+         !      max_chem(k, p_chem_ic_bc1), max_chem(k, p_chem_ic_bc2), max_chem(k, p_chem_ic_oc1), max_chem(k, p_chem_ic_oc2), &
+         !      max_chem(k, p_chem_ic_dust_1), max_chem(k, p_chem_ic_dust_2), max_chem(k, p_chem_ic_seas_1), max_chem(k, p_chem_ic_seas_1)
+         case ( 108 )     ! racm_soa_vbs_da
+            write(unit=stats_unit2, fmt='(i4,39(f12.4,2i5))') k, &
+               max_chem(k, p_chem_ic_so4aj),  max_chem(k, p_chem_ic_so4ai),  max_chem(k, p_chem_ic_nh4aj),  max_chem(k, p_chem_ic_nh4ai), &
+               max_chem(k, p_chem_ic_no3aj),  max_chem(k, p_chem_ic_no3ai),  max_chem(k, p_chem_ic_naaj),   max_chem(k, p_chem_ic_naai),  &
+               max_chem(k, p_chem_ic_asoa1j), max_chem(k, p_chem_ic_asoa1i), max_chem(k, p_chem_ic_asoa2j), max_chem(k, p_chem_ic_asoa2i), &
+               max_chem(k, p_chem_ic_asoa3j), max_chem(k, p_chem_ic_asoa3i), max_chem(k, p_chem_ic_asoa4j), max_chem(k, p_chem_ic_asoa4i), &
+               max_chem(k, p_chem_ic_bsoa1j), max_chem(k, p_chem_ic_bsoa1i), max_chem(k, p_chem_ic_bsoa2j), max_chem(k, p_chem_ic_bsoa2i), &
+               max_chem(k, p_chem_ic_bsoa3j), max_chem(k, p_chem_ic_bsoa3i), max_chem(k, p_chem_ic_bsoa4j), max_chem(k, p_chem_ic_bsoa4i), &
+               max_chem(k, p_chem_ic_orgpaj), max_chem(k, p_chem_ic_orgpai), max_chem(k, p_chem_ic_ecj),    max_chem(k, p_chem_ic_eci),    &
+               max_chem(k, p_chem_ic_p25j),   max_chem(k, p_chem_ic_p25i),   max_chem(k, p_chem_ic_antha),  max_chem(k, p_chem_ic_seas),   &
+               max_chem(k, p_chem_ic_soila),  max_chem(k, p_chem_ic_claj),   max_chem(k, p_chem_ic_clai),  &
+               max_chem(k, p_chem_ic_so2),    max_chem(k, p_chem_ic_no2),    max_chem(k, p_chem_ic_o3),     max_chem(k, p_chem_ic_co)
+         !case ( 7 )
+         !   write(unit=stats_unit2, fmt='(i4,24(f12.4))') k, &
+         !      max_chem(k, p_chem_ic_bc_a01), max_chem(k, p_chem_ic_bc_a02), max_chem(k, p_chem_ic_bc_a03), &
+         !      max_chem(k, p_chem_ic_oc_a01), max_chem(k, p_chem_ic_oc_a02), max_chem(k, p_chem_ic_oc_a03), &
+         !      max_chem(k, p_chem_ic_so4_a01), max_chem(k, p_chem_ic_so4_a02), max_chem(k, p_chem_ic_so4_a03), &
+         !      max_chem(k, p_chem_ic_no3_a01), max_chem(k, p_chem_ic_no3_a02), max_chem(k, p_chem_ic_no3_a03), &
+         !      max_chem(k, p_chem_ic_nh4_a01), max_chem(k, p_chem_ic_nh4_a02), max_chem(k, p_chem_ic_nh4_a03), &
+         !      max_chem(k, p_chem_ic_cl_a01), max_chem(k, p_chem_ic_cl_a02), max_chem(k, p_chem_ic_cl_a03), &
+         !      max_chem(k, p_chem_ic_na_a01), max_chem(k, p_chem_ic_na_a02), max_chem(k, p_chem_ic_na_a03), &
+         !      max_chem(k, p_chem_ic_oin_a01), max_chem(k, p_chem_ic_oin_a02), max_chem(k, p_chem_ic_oin_a03)
          end select
 #endif
       end if
@@ -362,10 +486,32 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
       select case ( chem_cv_options )
-      case ( 1 )
-          write(unit=stats_unit2, fmt='(a,4(f12.4,10x),6(e12.4,10x))') ' ALL', &
-             chemm(p_chem_ic_p25), chemm(p_chem_ic_sulf), chemm(p_chem_ic_bc1), chemm(p_chem_ic_bc2), chemm(p_chem_ic_oc1), &
-             chemm(p_chem_ic_oc2), chemm(p_chem_ic_dust_1), chemm(p_chem_ic_dust_2), chemm(p_chem_ic_seas_1), chemm(p_chem_ic_seas_2)
+      !case ( 112 )
+      !    write(unit=stats_unit2, fmt='(a,4(f12.4,10x),6(e12.4,10x))') ' ALL', &
+      !       chemm(p_chem_ic_p25), chemm(p_chem_ic_sulf), chemm(p_chem_ic_bc1), chemm(p_chem_ic_bc2), chemm(p_chem_ic_oc1), &
+      !       chemm(p_chem_ic_oc2), chemm(p_chem_ic_dust_1), chemm(p_chem_ic_dust_2), chemm(p_chem_ic_seas_1), chemm(p_chem_ic_seas_2)
+      case ( 108 )     ! racm_soa_vbs_da
+          write(unit=stats_unit2, fmt='(a,39(f12.4,10x))') ' ALL', &
+               chemm(p_chem_ic_so4aj),  chemm(p_chem_ic_so4ai),  chemm(p_chem_ic_nh4aj),  chemm(p_chem_ic_nh4ai), &
+               chemm(p_chem_ic_no3aj),  chemm(p_chem_ic_no3ai),  chemm(p_chem_ic_naaj),   chemm(p_chem_ic_naai),  &
+               chemm(p_chem_ic_asoa1j), chemm(p_chem_ic_asoa1i), chemm(p_chem_ic_asoa2j), chemm(p_chem_ic_asoa2i), &
+               chemm(p_chem_ic_asoa3j), chemm(p_chem_ic_asoa3i), chemm(p_chem_ic_asoa4j), chemm(p_chem_ic_asoa4i), &
+               chemm(p_chem_ic_bsoa1j), chemm(p_chem_ic_bsoa1i), chemm(p_chem_ic_bsoa2j), chemm(p_chem_ic_bsoa2i), &
+               chemm(p_chem_ic_bsoa3j), chemm(p_chem_ic_bsoa3i), chemm(p_chem_ic_bsoa4j), chemm(p_chem_ic_bsoa4i), &
+               chemm(p_chem_ic_orgpaj), chemm(p_chem_ic_orgpai), chemm(p_chem_ic_ecj),    chemm(p_chem_ic_eci),    &
+               chemm(p_chem_ic_p25j),   chemm(p_chem_ic_p25i),   chemm(p_chem_ic_antha),  chemm(p_chem_ic_seas),   &
+               chemm(p_chem_ic_soila),  chemm(p_chem_ic_claj),   chemm(p_chem_ic_clai),  &
+               chemm(p_chem_ic_so2),    chemm(p_chem_ic_no2),    chemm(p_chem_ic_o3),     chemm(p_chem_ic_co)
+      !case ( 7 )
+      !    write(unit=stats_unit2, fmt='(a,24(f12.4,10x))') ' ALL', &
+      !       chemm(p_chem_ic_bc_a01), chemm(p_chem_ic_bc_a02), chemm(p_chem_ic_bc_a03),  &
+      !       chemm(p_chem_ic_oc_a01), chemm(p_chem_ic_oc_a02), chemm(p_chem_ic_oc_a03),  &
+      !       chemm(p_chem_ic_so4_a01), chemm(p_chem_ic_so4_a02), chemm(p_chem_ic_so4_a03),  &
+      !       chemm(p_chem_ic_no3_a01), chemm(p_chem_ic_no3_a02), chemm(p_chem_ic_no3_a03),  &
+      !       chemm(p_chem_ic_nh4_a01), chemm(p_chem_ic_nh4_a02), chemm(p_chem_ic_nh4_a03),  &
+      !       chemm(p_chem_ic_cl_a01), chemm(p_chem_ic_cl_a02), chemm(p_chem_ic_cl_a03),  &
+      !       chemm(p_chem_ic_na_a01), chemm(p_chem_ic_na_a02), chemm(p_chem_ic_na_a03),  &
+      !       chemm(p_chem_ic_oin_a01), chemm(p_chem_ic_oin_a02), chemm(p_chem_ic_oin_a03)
       end select
 #endif
 
@@ -374,7 +520,7 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 #if (WRF_CHEM == 1)
       write(unit=stats_unit2, fmt='(/a/)') ' Mean of gridded analysis increments'
       select case ( chem_cv_options )
-       case ( 1 )
+       case ( 112 )
           write(unit=stats_unit2, fmt='(a/)') &
             ' Lvl        p25           sulf           bc1           bc2           oc1           oc2         dust_1         dust_2         seas_1         seas_2'
       end select
@@ -470,11 +616,33 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-            write(unit=stats_unit2, fmt='(i4,10e14.4)') k, &
-               chemv(k, p_chem_ic_p25)*rij_g, chemv(k, p_chem_ic_sulf)*rij_g, &
-               chemv(k, p_chem_ic_bc1)*rij_g, chemv(k, p_chem_ic_bc2)*rij_g, chemv(k, p_chem_ic_oc1)*rij_g, chemv(k, p_chem_ic_oc2)*rij_g, &
-               chemv(k, p_chem_ic_dust_1)*rij_g, chemv(k, p_chem_ic_dust_2)*rij_g, chemv(k, p_chem_ic_seas_2)*rij_g, chemv(k, p_chem_ic_seas_2)*rij_g
+         !case ( 112 )
+         !   write(unit=stats_unit2, fmt='(i4,10e14.4)') k, &
+         !      chemv(k, p_chem_ic_p25)*rij_g, chemv(k, p_chem_ic_sulf)*rij_g, &
+         !      chemv(k, p_chem_ic_bc1)*rij_g, chemv(k, p_chem_ic_bc2)*rij_g, chemv(k, p_chem_ic_oc1)*rij_g, chemv(k, p_chem_ic_oc2)*rij_g, &
+         !      chemv(k, p_chem_ic_dust_1)*rij_g, chemv(k, p_chem_ic_dust_2)*rij_g, chemv(k, p_chem_ic_seas_2)*rij_g, chemv(k, p_chem_ic_seas_2)*rij_g
+         case ( 108 )     ! racm_soa_vbs_da
+            write(unit=stats_unit2, fmt='(i4,39f12.5)') k, &
+               chemv(k, p_chem_ic_so4aj)*rij_g,  chemv(k, p_chem_ic_so4ai)*rij_g,  chemv(k, p_chem_ic_nh4aj)*rij_g,  chemv(k, p_chem_ic_nh4ai)*rij_g, &
+               chemv(k, p_chem_ic_no3aj)*rij_g,  chemv(k, p_chem_ic_no3ai)*rij_g,  chemv(k, p_chem_ic_naaj)*rij_g,   chemv(k, p_chem_ic_naai)*rij_g,  &
+               chemv(k, p_chem_ic_asoa1j)*rij_g, chemv(k, p_chem_ic_asoa1i)*rij_g, chemv(k, p_chem_ic_asoa2j)*rij_g, chemv(k, p_chem_ic_asoa2i)*rij_g, &
+               chemv(k, p_chem_ic_asoa3j)*rij_g, chemv(k, p_chem_ic_asoa3i)*rij_g, chemv(k, p_chem_ic_asoa4j)*rij_g, chemv(k, p_chem_ic_asoa4i)*rij_g, &
+               chemv(k, p_chem_ic_bsoa1j)*rij_g, chemv(k, p_chem_ic_bsoa1i)*rij_g, chemv(k, p_chem_ic_bsoa2j)*rij_g, chemv(k, p_chem_ic_bsoa2i)*rij_g, &
+               chemv(k, p_chem_ic_bsoa3j)*rij_g, chemv(k, p_chem_ic_bsoa3i)*rij_g, chemv(k, p_chem_ic_bsoa4j)*rij_g, chemv(k, p_chem_ic_bsoa4i)*rij_g, &
+               chemv(k, p_chem_ic_orgpaj)*rij_g, chemv(k, p_chem_ic_orgpai)*rij_g, chemv(k, p_chem_ic_ecj)*rij_g,    chemv(k, p_chem_ic_eci)*rij_g,    &
+               chemv(k, p_chem_ic_p25j)*rij_g,   chemv(k, p_chem_ic_p25i)*rij_g,   chemv(k, p_chem_ic_antha)*rij_g,  chemv(k, p_chem_ic_seas)*rij_g,   &
+               chemv(k, p_chem_ic_soila)*rij_g,  chemv(k, p_chem_ic_claj)*rij_g,   chemv(k, p_chem_ic_clai)*rij_g,  &
+               chemv(k, p_chem_ic_so2)*rij_g,    chemv(k, p_chem_ic_no2)*rij_g,    chemv(k, p_chem_ic_o3)*rij_g,     chemv(k, p_chem_ic_co)*rij_g
+         !case ( 7 )
+         !   write(unit=stats_unit2, fmt='(i4,24e14.4)') k, &
+         !      chemv(k, p_chem_ic_bc_a01)*rij_g, chemv(k, p_chem_ic_bc_a02)*rij_g, chemv(k, p_chem_ic_bc_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_oc_a01)*rij_g, chemv(k, p_chem_ic_oc_a02)*rij_g, chemv(k, p_chem_ic_oc_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_so4_a01)*rij_g, chemv(k, p_chem_ic_so4_a02)*rij_g, chemv(k, p_chem_ic_so4_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_no3_a01)*rij_g, chemv(k, p_chem_ic_no3_a02)*rij_g, chemv(k, p_chem_ic_no3_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_nh4_a01)*rij_g, chemv(k, p_chem_ic_nh4_a02)*rij_g, chemv(k, p_chem_ic_nh4_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_cl_a01)*rij_g, chemv(k, p_chem_ic_cl_a02)*rij_g, chemv(k, p_chem_ic_cl_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_na_a01)*rij_g, chemv(k, p_chem_ic_na_a02)*rij_g, chemv(k, p_chem_ic_na_a03)*rij_g,  &
+         !      chemv(k, p_chem_ic_oin_a01)*rij_g, chemv(k, p_chem_ic_oin_a02)*rij_g, chemv(k, p_chem_ic_oin_a03)*rij_g
          end select
          do ic=PARAM_FIRST_SCALAR, num_chem
            chemm(ic)=chemm(ic)+chemv(k,ic)
@@ -515,11 +683,33 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-         write(unit=stats_unit2, fmt='(a,10e14.4)') ' ALL',   &                                                                                      
-            chemv(k, p_chem_ic_p25)*rijk_g, chemv(k, p_chem_ic_sulf)*rijk_g, &
-            chemv(k, p_chem_ic_bc1)*rijk_g, chemv(k, p_chem_ic_bc2)*rijk_g, chemv(k, p_chem_ic_oc1)*rijk_g, chemv(k, p_chem_ic_oc2)*rijk_g, &
-            chemv(k, p_chem_ic_dust_1)*rijk_g, chemv(k, p_chem_ic_dust_2)*rijk_g, chemv(k, p_chem_ic_seas_2)*rijk_g, chemv(k, p_chem_ic_seas_2)*rijk_g
+         !case ( 112 )
+         !write(unit=stats_unit2, fmt='(a,10e14.4)') ' ALL',   &                                                                                      
+         !   chemv(k, p_chem_ic_p25)*rijk_g, chemv(k, p_chem_ic_sulf)*rijk_g, &
+         !   chemv(k, p_chem_ic_bc1)*rijk_g, chemv(k, p_chem_ic_bc2)*rijk_g, chemv(k, p_chem_ic_oc1)*rijk_g, chemv(k, p_chem_ic_oc2)*rijk_g, &
+         !   chemv(k, p_chem_ic_dust_1)*rijk_g, chemv(k, p_chem_ic_dust_2)*rijk_g, chemv(k, p_chem_ic_seas_2)*rijk_g, chemv(k, p_chem_ic_seas_2)*rijk_g
+         case ( 108 )     ! racm_soa_vbs_da
+         write(unit=stats_unit2, fmt='(a,39f12.5)') ' ALL',   &                                                                                      
+            chemv(k, p_chem_ic_so4aj)*rijk_g,  chemv(k, p_chem_ic_so4ai)*rijk_g,  chemv(k, p_chem_ic_nh4aj)*rijk_g,  chemv(k, p_chem_ic_nh4ai)*rijk_g, &
+            chemv(k, p_chem_ic_no3aj)*rijk_g,  chemv(k, p_chem_ic_no3ai)*rijk_g,  chemv(k, p_chem_ic_naaj)*rijk_g,   chemv(k, p_chem_ic_naai)*rijk_g,  &
+            chemv(k, p_chem_ic_asoa1j)*rijk_g, chemv(k, p_chem_ic_asoa1i)*rijk_g, chemv(k, p_chem_ic_asoa2j)*rijk_g, chemv(k, p_chem_ic_asoa2i)*rijk_g, &
+            chemv(k, p_chem_ic_asoa3j)*rijk_g, chemv(k, p_chem_ic_asoa3i)*rijk_g, chemv(k, p_chem_ic_asoa4j)*rijk_g, chemv(k, p_chem_ic_asoa4i)*rijk_g, &
+            chemv(k, p_chem_ic_bsoa1j)*rijk_g, chemv(k, p_chem_ic_bsoa1i)*rijk_g, chemv(k, p_chem_ic_bsoa2j)*rijk_g, chemv(k, p_chem_ic_bsoa2i)*rijk_g, &
+            chemv(k, p_chem_ic_bsoa3j)*rijk_g, chemv(k, p_chem_ic_bsoa3i)*rijk_g, chemv(k, p_chem_ic_bsoa4j)*rijk_g, chemv(k, p_chem_ic_bsoa4i)*rijk_g, &
+            chemv(k, p_chem_ic_orgpaj)*rijk_g, chemv(k, p_chem_ic_orgpai)*rijk_g, chemv(k, p_chem_ic_ecj)*rijk_g,    chemv(k, p_chem_ic_eci)*rijk_g,    &
+            chemv(k, p_chem_ic_p25j)*rijk_g,   chemv(k, p_chem_ic_p25i)*rijk_g,   chemv(k, p_chem_ic_antha)*rijk_g,  chemv(k, p_chem_ic_seas)*rijk_g,   &
+            chemv(k, p_chem_ic_soila)*rijk_g,  chemv(k, p_chem_ic_claj)*rijk_g,   chemv(k, p_chem_ic_clai)*rijk_g,  &
+            chemv(k, p_chem_ic_so2)*rijk_g,    chemv(k, p_chem_ic_no2)*rijk_g,    chemv(k, p_chem_ic_o3)*rijk_g,     chemv(k, p_chem_ic_co)*rijk_g
+         !case ( 7 )
+         !write(unit=stats_unit2, fmt='(a,24e14.4)') ' ALL',   &
+         !   chemv(k, p_chem_ic_bc_a01)*rijk_g, chemv(k, p_chem_ic_bc_a02)*rijk_g, chemv(k, p_chem_ic_bc_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_oc_a01)*rijk_g, chemv(k, p_chem_ic_oc_a02)*rijk_g, chemv(k, p_chem_ic_oc_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_so4_a01)*rijk_g, chemv(k, p_chem_ic_so4_a02)*rijk_g, chemv(k, p_chem_ic_so4_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_no3_a01)*rijk_g, chemv(k, p_chem_ic_no3_a02)*rijk_g, chemv(k, p_chem_ic_no3_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_nh4_a01)*rijk_g, chemv(k, p_chem_ic_nh4_a02)*rijk_g, chemv(k, p_chem_ic_nh4_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_cl_a01)*rijk_g, chemv(k, p_chem_ic_cl_a02)*rijk_g, chemv(k, p_chem_ic_cl_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_na_a01)*rijk_g, chemv(k, p_chem_ic_na_a02)*rijk_g, chemv(k, p_chem_ic_na_a03)*rijk_g, &
+         !   chemv(k, p_chem_ic_oin_a01)*rijk_g, chemv(k, p_chem_ic_oin_a02)*rijk_g, chemv(k, p_chem_ic_oin_a03)*rijk_g
          end select
 #endif
 
@@ -527,7 +717,7 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
       write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
 
 #if (WRF_CHEM == 1)
-      write(unit=stats_unit2, fmt='(/a/)') ' Mean of gridded analysis increments'
+      write(unit=stats_unit2, fmt='(/a/)') ' RMSE of gridded analysis increments'
       select case ( chem_cv_options )
        case ( 1 )
           write(unit=stats_unit2, fmt='(a/)') &
@@ -668,18 +858,69 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-            write(unit=stats_unit2, fmt='(i4,10e14.4)') k, &
-               sqrt(chemv(k, p_chem_ic_p25)*rij_g),   &
-               sqrt(chemv(k, p_chem_ic_sulf)*rij_g),   &
-               sqrt(chemv(k, p_chem_ic_bc1)*rij_g),   &
-               sqrt(chemv(k, p_chem_ic_bc2)*rij_g),   &
-               sqrt(chemv(k, p_chem_ic_oc1)*rij_g),   &
-               sqrt(chemv(k, p_chem_ic_oc2)*rij_g), &
-               sqrt(chemv(k, p_chem_ic_dust_1)*rij_g), &
-               sqrt(chemv(k, p_chem_ic_dust_2)*rij_g), &
-               sqrt(chemv(k, p_chem_ic_seas_1)*rij_g), &
-               sqrt(chemv(k, p_chem_ic_seas_2)*rij_g)
+         !case ( 112 )
+         !   write(unit=stats_unit2, fmt='(i4,10e14.4)') k, &
+         !      sqrt(chemv(k, p_chem_ic_p25)*rij_g),   &
+         !      sqrt(chemv(k, p_chem_ic_sulf)*rij_g),   &
+         !      sqrt(chemv(k, p_chem_ic_bc1)*rij_g),   &
+         !      sqrt(chemv(k, p_chem_ic_bc2)*rij_g),   &
+         !      sqrt(chemv(k, p_chem_ic_oc1)*rij_g),   &
+         !      sqrt(chemv(k, p_chem_ic_oc2)*rij_g), &
+         !      sqrt(chemv(k, p_chem_ic_dust_1)*rij_g), &
+         !      sqrt(chemv(k, p_chem_ic_dust_2)*rij_g), &
+         !      sqrt(chemv(k, p_chem_ic_seas_1)*rij_g), &
+         !      sqrt(chemv(k, p_chem_ic_seas_2)*rij_g)
+         case ( 108 )
+            write(unit=stats_unit2, fmt='(i4,39f12.3)') k, &
+               sqrt(chemv(k, p_chem_ic_so4aj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_so4ai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_nh4aj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_nh4ai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_no3aj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_no3ai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_naaj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_naai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_claj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_clai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa1j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa1i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa2j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa2i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa3j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa3i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa4j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_asoa4i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa1j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa1i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa2j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa2i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa3j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa3i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa4j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_bsoa4i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_orgpaj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_orgpai)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_ecj)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_eci)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_p25j)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_p25i)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_antha)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_seas)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_soila)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_so2)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_no2)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_o3)*rij_g), &
+               sqrt(chemv(k, p_chem_ic_co)*rij_g)
+         !case ( 7 )
+         !   write(unit=stats_unit2, fmt='(i4,24e14.4)') k, &
+         !      sqrt(chemv(k, p_chem_ic_bc_a01)*rij_g), sqrt(chemv(k, p_chem_ic_bc_a02)*rij_g), sqrt(chemv(k, p_chem_ic_bc_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_oc_a01)*rij_g), sqrt(chemv(k, p_chem_ic_oc_a02)*rij_g), sqrt(chemv(k, p_chem_ic_oc_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_so4_a01)*rij_g), sqrt(chemv(k, p_chem_ic_so4_a02)*rij_g), sqrt(chemv(k, p_chem_ic_so4_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_no3_a01)*rij_g), sqrt(chemv(k, p_chem_ic_no3_a02)*rij_g), sqrt(chemv(k, p_chem_ic_no3_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_nh4_a01)*rij_g), sqrt(chemv(k, p_chem_ic_nh4_a02)*rij_g), sqrt(chemv(k, p_chem_ic_nh4_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_cl_a01)*rij_g), sqrt(chemv(k, p_chem_ic_cl_a02)*rij_g), sqrt(chemv(k, p_chem_ic_cl_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_na_a01)*rij_g), sqrt(chemv(k, p_chem_ic_na_a02)*rij_g), sqrt(chemv(k, p_chem_ic_na_a03)*rij_g),  &
+         !      sqrt(chemv(k, p_chem_ic_oin_a01)*rij_g), sqrt(chemv(k, p_chem_ic_oin_a02)*rij_g), sqrt(chemv(k, p_chem_ic_oin_a03)*rij_g)
          end select
          do ic=PARAM_FIRST_SCALAR, num_chem
            chemm(ic)=chemm(ic)+chemv(k,ic)
@@ -723,12 +964,44 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 
 #if (WRF_CHEM == 1)
          select case ( chem_cv_options )
-         case ( 1 )
-         write(unit=stats_unit2, fmt='(a,10e14.4)') ' ALL', &
-         sqrt(chemm(p_chem_ic_p25)*rijk_g), sqrt(chemm(p_chem_ic_sulf)*rijk_g),   &
-         sqrt(chemm(p_chem_ic_bc1)*rijk_g), sqrt(chemm(p_chem_ic_bc2)*rijk_g), sqrt(chemm(p_chem_ic_oc1)*rijk_g), sqrt(chemm(p_chem_ic_oc2)*rijk_g), &
-         sqrt(chemm(p_chem_ic_dust_1)*rijk_g), sqrt(chemm(p_chem_ic_dust_2)*rijk_g), &
-         sqrt(chemm(p_chem_ic_seas_1)*rijk_g), sqrt(chemm(p_chem_ic_seas_2)*rijk_g)
+         !case ( 112 )
+         !write(unit=stats_unit2, fmt='(a,10e14.4)') ' ALL', &
+         !sqrt(chemm(p_chem_ic_p25)*rijk_g), sqrt(chemm(p_chem_ic_sulf)*rijk_g),   &
+         !sqrt(chemm(p_chem_ic_bc1)*rijk_g), sqrt(chemm(p_chem_ic_bc2)*rijk_g), sqrt(chemm(p_chem_ic_oc1)*rijk_g), sqrt(chemm(p_chem_ic_oc2)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_dust_1)*rijk_g), sqrt(chemm(p_chem_ic_dust_2)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_seas_1)*rijk_g), sqrt(chemm(p_chem_ic_seas_2)*rijk_g)
+         case ( 108 )
+         write(unit=stats_unit2, fmt='(a,39f12.5)') ' ALL', &
+         sqrt(chemm(p_chem_ic_so4aj)*rijk_g),  sqrt(chemm(p_chem_ic_so4ai)*rijk_g),  &
+         sqrt(chemm(p_chem_ic_nh4aj)*rijk_g),  sqrt(chemm(p_chem_ic_nh4ai)*rijk_g),  &
+         sqrt(chemm(p_chem_ic_no3aj)*rijk_g),  sqrt(chemm(p_chem_ic_no3ai)*rijk_g),  &
+         sqrt(chemm(p_chem_ic_naaj)*rijk_g),   sqrt(chemm(p_chem_ic_naai)*rijk_g),   &
+         sqrt(chemm(p_chem_ic_claj)*rijk_g),   sqrt(chemm(p_chem_ic_clai)*rijk_g),   &
+         sqrt(chemm(p_chem_ic_asoa1j)*rijk_g), sqrt(chemm(p_chem_ic_asoa1i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_asoa2j)*rijk_g), sqrt(chemm(p_chem_ic_asoa2i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_asoa3j)*rijk_g), sqrt(chemm(p_chem_ic_asoa3i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_asoa4j)*rijk_g), sqrt(chemm(p_chem_ic_asoa4i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_bsoa1j)*rijk_g), sqrt(chemm(p_chem_ic_bsoa1i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_bsoa2j)*rijk_g), sqrt(chemm(p_chem_ic_bsoa2i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_bsoa3j)*rijk_g), sqrt(chemm(p_chem_ic_bsoa3i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_bsoa4j)*rijk_g), sqrt(chemm(p_chem_ic_bsoa4i)*rijk_g), &
+         sqrt(chemm(p_chem_ic_orgpaj)*rijk_g), sqrt(chemm(p_chem_ic_orgpai)*rijk_g), &
+         sqrt(chemm(p_chem_ic_ecj)*rijk_g),    sqrt(chemm(p_chem_ic_eci)*rijk_g),    &
+         sqrt(chemm(p_chem_ic_p25j)*rijk_g),   sqrt(chemm(p_chem_ic_p25i)*rijk_g),   &
+         sqrt(chemm(p_chem_ic_antha)*rijk_g),  sqrt(chemm(p_chem_ic_seas)*rijk_g),   &
+         sqrt(chemm(p_chem_ic_soila)*rijk_g),  sqrt(chemm(p_chem_ic_so2)*rijk_g),    &
+         sqrt(chemm(p_chem_ic_no2)*rijk_g),    sqrt(chemm(p_chem_ic_o3)*rijk_g),     &
+         sqrt(chemm(p_chem_ic_co)*rijk_g)
+         !case ( 7 )
+         !write(unit=stats_unit2, fmt='(a,24e14.4)') ' ALL', &
+         !sqrt(chemm(p_chem_ic_bc_a01)*rijk_g), sqrt(chemm(p_chem_ic_bc_a02)*rijk_g), sqrt(chemm(p_chem_ic_bc_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_oc_a01)*rijk_g), sqrt(chemm(p_chem_ic_oc_a02)*rijk_g), sqrt(chemm(p_chem_ic_oc_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_so4_a01)*rijk_g), sqrt(chemm(p_chem_ic_so4_a02)*rijk_g), sqrt(chemm(p_chem_ic_so4_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_no3_a01)*rijk_g), sqrt(chemm(p_chem_ic_no3_a02)*rijk_g), sqrt(chemm(p_chem_ic_no3_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_nh4_a01)*rijk_g), sqrt(chemm(p_chem_ic_nh4_a02)*rijk_g), sqrt(chemm(p_chem_ic_nh4_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_cl_a01)*rijk_g), sqrt(chemm(p_chem_ic_cl_a02)*rijk_g), sqrt(chemm(p_chem_ic_cl_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_na_a01)*rijk_g), sqrt(chemm(p_chem_ic_na_a02)*rijk_g), sqrt(chemm(p_chem_ic_na_a03)*rijk_g), &
+         !sqrt(chemm(p_chem_ic_oin_a01)*rijk_g), sqrt(chemm(p_chem_ic_oin_a02)*rijk_g), sqrt(chemm(p_chem_ic_oin_a03)*rijk_g)
          end select
 #endif
    end if

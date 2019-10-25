@@ -893,10 +893,14 @@
       call da_allocate_y (iv, re)
       call da_allocate_y (iv, y)
 #if (WRF_CHEM == 1)
+   if (cv_options .eq. 10) then
       call da_allocate_y_chem (iv, re)
       call da_allocate_y_chem (iv, y)
+   !if ( chem_cv_options >= 1 ) then
+   !   call da_allocate_y_chem_sfc (iv, re)
+   !   call da_allocate_y_chem_sfc (iv, y)
+   endif
 #endif
-
 
       if (use_lanczos) then
          if (read_lanczos) then
@@ -942,6 +946,7 @@
 
       ! Update outer-loop control variable
       cvt = cvt + xhat
+
       if ( outer_loop_restart ) then
         open(unit=cvt_unit,status='unknown',file=trim(cvtfile),iostat=iost,form='UNFORMATTED')
         if (iost /= 0) then
@@ -967,15 +972,16 @@
       if (.not. var4d) then
          ! as of V3.9, vp%alpha is not included in the vptox (called by vtox) calculation,
          ! here grid%xa contains only the static increment
+
+         ! FIXME - Why do we call da_transform_vtox twice here and below (WRF_CHEM == 1)?
          call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
 
 #if (WRF_CHEM == 1)
-   if (cv_options == 10 ) then
-            call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp,grid%vch)
-   else if (cv_options == 7 .and. chem_cv_options==1) then
-!            call da_transform_vtox (grid,be%cv%size_jb,xbx,be,grid%ep,xhat(1:be%cv%size_jb),grid%vv,grid%vp,grid%vch,grid%vchem)
-            call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp,vchem=grid%vchem)
-   end if
+         if (cv_options == 10 ) then    ! for emission - JJ
+         call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp,grid%vch)
+         else if ( cv_options == 7 .and. chem_cv_options >= 1 ) then
+         call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp,vchem=grid%vchem)
+         end if
 #else
          call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
 
@@ -991,7 +997,8 @@
             call da_transform_vpatox (grid,be,grid%ep,grid%vp,ifgat_ana)
             call da_add_xa(grid%xa, grid%xa_ens) !grid%xa = grid%xa + xa_ens
          end if !ne>0
-      else
+
+      else     ! var4d
          call da_transform_vtox (grid,be%cv%size_jb,xbx,be,grid%ep,xhat(1:be%cv%size_jb),grid%vv,grid%vp &
 #if (WRF_CHEM == 1)
          , grid%vch &
@@ -1051,11 +1058,9 @@
                 call da_varbc_update(it, cv_size, xhat, iv)
 #endif
 
-
       !------------------------------------------------------------------------
       ! [8.10] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
-
       call da_transfer_xatoanalysis (it, xbx, grid, config_flags)
 
      if ( it < max_ext_its .and. print_detail_outerloop ) then
@@ -1077,11 +1082,13 @@
         deallocate (eignval)
      end if
 
-
-   end do
+   end do    !do it = 1, max_ext_its (Outer loop)
+   !---------------------------------------------------------------------------
+   ! End of [8] Outerloop and chem Sensitivity
+   !---------------------------------------------------------------------------
 
    ! output wrfvar analysis
-
+   !---------------------------------------------------------------------------
    if ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) then
       call da_update_firstguess(input_grid)
