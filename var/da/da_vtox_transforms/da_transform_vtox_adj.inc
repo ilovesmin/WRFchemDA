@@ -42,65 +42,61 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv &
       !----------------------------------------------------------------------
       ! [2.0c]: Perform x = u_ch vch transform:
       !----------------------------------------------------------------------
-       call da_zero_xch_type (vch)
-       call da_transform_vchtox_adj(grid, vch, be)
+         call da_zero_xch_type (vch)
+         call da_transform_vchtox_adj(grid, vch, be)
 
       else if ( chem_cv_options >= 1 .and. present(vchem) ) then
 
          call da_zero_xchem_type (vchem)
          call da_transform_vchemtox_adj(grid, vchem, be)   
 
-      else  
+      endif
 #endif
  
-   !-------------------------------------------------------------------------
-   ! [3.0]: Perform x = u_p vp transform::
-   !-------------------------------------------------------------------------
+      !-------------------------------------------------------------------------
+      ! [3.0]: Perform x = u_p vp transform::
+      !-------------------------------------------------------------------------
 
-   !zero out vp outside this subroutine in order for vp%alpha to pass in
-   !call da_zero_vp_type (vp)
-   call da_transform_vptox_adj(grid, vp, be, ep)
+      !zero out vp outside this subroutine in order for vp%alpha to pass in
+      !call da_zero_vp_type (vp)
+      call da_transform_vptox_adj(grid, vp, be, ep)
 
-   !-------------------------------------------------------------------------
-   ! [2.0]: Perform vp = u_v vv transform:
-   !-------------------------------------------------------------------------
-   call da_zero_vp_type (vv)
+      !-------------------------------------------------------------------------
+      ! [2.0]: Perform vp = u_v vv transform:
+      !-------------------------------------------------------------------------
+      call da_zero_vp_type (vv)
 
-   if (vert_corr == 2) then      
-      call da_vertical_transform(grid, 'u_adj', be, &
-         grid%xb % vertical_inner_product, vv, vp)
+      if (vert_corr == 2) then      
+         call da_vertical_transform(grid, 'u_adj', be, &
+            grid%xb % vertical_inner_product, vv, vp)
 
-   else
-      vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)
-      vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)
-      vv % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte)
-      vv % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)
-      vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
+      else
+         vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)
+         vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)
+         vv % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte)
+         vv % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)
+         vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
 
-
-      if ( cloud_cv_options >= 2 ) then
+         if ( cloud_cv_options >= 2 ) then
          vv % v6(its:ite,jts:jte,kts:kte)  = vp % v6(its:ite,jts:jte,kts:kte)
          vv % v7(its:ite,jts:jte,kts:kte)  = vp % v7(its:ite,jts:jte,kts:kte)
          vv % v8(its:ite,jts:jte,kts:kte)  = vp % v8(its:ite,jts:jte,kts:kte)
          vv % v9(its:ite,jts:jte,kts:kte)  = vp % v9(its:ite,jts:jte,kts:kte)
          vv % v10(its:ite,jts:jte,kts:kte) = vp % v10(its:ite,jts:jte,kts:kte)
-      end if
-      if ( use_cv_w ) then
+         end if
+         if ( use_cv_w ) then
          vv % v11(its:ite,jts:jte,kts:kte) = vp % v11(its:ite,jts:jte,kts:kte)
-      end if
+         end if
 
-   !  Uv for alpha is an identity transform:
-      if (be % ne > 0) then
+      !  Uv for alpha is an identity transform:
+         if (be % ne > 0) then
 !        vv % alpha(its:ite,jts:jte,kts:kte,1:be%ne) = &
 !        vp % alpha(its:ite,jts:jte,kts:kte,1:be%ne) 
          vv % alpha(its_int:ite_int,jts_int:jte_int,kts_int:kte_int,1:be%ne) = & 
          vp % alpha(its_int:ite_int,jts_int:jte_int,kts_int:kte_int,1:be%ne)
-      end if
-   end if  !  if (vert_corr == 2) then      
+         end if
+      end if  !  if (vert_corr == 2) then      
 
-#if (WRF_CHEM == 1)
-      end if
-#endif
    end if  !  if (  cv_options == 3 ) then
 
    !-------------------------------------------------------------------------
@@ -113,11 +109,10 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv &
               fg_format == fg_format_wrf_nmm_regional) .and. &
               (.not. cv_options == 3) ) then
 #if (WRF_CHEM == 1)
-!        if (present(vchem) .and. iv%info(chemic_surf)%nlocal > 0) then
         if (present(vchem)) then
-         call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vchem=vchem)
+            call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vchem=vchem)
         else if (present(vch)) then
-         call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vch=vch)
+            call da_transform_vtovv_adj(grid, cv_size, be, cv, vv, vch=vch)
         else
 #endif
          call da_transform_vtovv_adj(grid, cv_size, be, cv, vv)

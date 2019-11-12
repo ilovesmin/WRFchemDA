@@ -62,7 +62,7 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
       do m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
       end do
-      m = 1
+      !m = 1
       !write(unit=stdout,fmt='(a,a,3f12.5,3f7.1)') 'rescale_be (j=89,m=1):',&
       !      be_sub%name, s(m),be_sub%val(89,m), var_scaling, len_scaling, ds
                                        

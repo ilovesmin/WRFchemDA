@@ -31,9 +31,8 @@ subroutine da_setup_be_regional(xb, be, grid)
                                          p_bsoa1j, p_bsoa1i, p_bsoa2j, p_bsoa2i, &
                                          p_bsoa3j, p_bsoa3i, p_bsoa4j, p_bsoa4i, &
                                          p_orgpaj, p_orgpai, p_ecj,    p_eci,    &
-                                         p_p25j,   p_p25i,   p_antha,  p_seas,   &
-                                         p_so2,    p_no2,    p_o3,     p_co,     &
-                                         p_soila
+                                         p_p25j,   p_p25i,   p_antha,  p_seas,   p_soila, &
+                                         p_so2,    p_no2,    p_o3,     p_co          ! gas species
    implicit none
 
    type (xb_type), intent(in)    :: xb                    ! First guess structure.
@@ -205,7 +204,6 @@ subroutine da_setup_be_regional(xb, be, grid)
 
    be_rf_unit    = unit_end + 1
    be_print_unit = unit_end + 2
-   !print*, 'da_setup_be_regional: be_rf_unit =',be_rf_unit
 
    call da_get_unit(be_unit)
    open(unit=be_unit,file="be.dat", status="old",form="unformatted")
@@ -838,8 +836,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('w' )
-           !if ( use_cv_w ) then
-           ! if ( trim(adjustl(variable)) == 'w' ) then
+           if ( use_cv_w ) then
                be % v11 % name = trim(adjustl(variable))
                read (be_unit)  be11_evec_glo
                read (be_unit)  be11_eval_glo
@@ -850,8 +847,7 @@ subroutine da_setup_be_regional(xb, be, grid)
                   be11_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
                   be11_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
                end do
-           ! end if
-           !end if
+           end if
 
          case default;
             message(1)=' Read problem in eigen vectors/values in BE file '
@@ -884,7 +880,8 @@ subroutine da_setup_be_regional(xb, be, grid)
       do i = num_cv_3d_basic+1 , num_cv_3d_basic+num_cv_3d_extra
          read (be_unit) variable
          read (be_unit) nk, num_bins2d
-         print *, trim(adjustl(variable)), ' i =', i, ' , nk =', nk, ', num_bins2d =',num_bins2d
+         !print *, trim(adjustl(variable)), ' i =', i, ' , nk =', nk, ', num_bins2d =',num_bins2d
+
          select case( trim(adjustl(variable)) )
   
          case ('so4aj' )
@@ -991,6 +988,32 @@ subroutine da_setup_be_regional(xb, be, grid)
                be12_eval_loc(ispcc,j,1:nk  ) = eval_loc(1:nk,b)
             end do
 
+         case ('claj' )
+            ispcc=p_claj-1
+            be % v12(ispcc) % name = trim(adjustl(variable))
+            read (be_unit)  be12_evec_glo(ispcc,:,:)
+            read (be_unit)  be12_eval_glo(ispcc,:)
+            read (be_unit)  evec_loc
+            read (be_unit)  eval_loc
+            do j=1,nj
+               b = bin2d(1,j)
+               be12_evec_loc(ispcc,j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+               be12_eval_loc(ispcc,j,1:nk  ) = eval_loc(1:nk,b)
+            end do
+
+         case ('clai' )
+            ispcc=p_clai-1
+            be % v12(ispcc) % name = trim(adjustl(variable))
+            read (be_unit)  be12_evec_glo(ispcc,:,:)
+            read (be_unit)  be12_eval_glo(ispcc,:)
+            read (be_unit)  evec_loc
+            read (be_unit)  eval_loc
+            do j=1,nj
+               b = bin2d(1,j)
+               be12_evec_loc(ispcc,j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
+               be12_eval_loc(ispcc,j,1:nk  ) = eval_loc(1:nk,b)
+            end do
+
          case ('asoa1j' )
             ispcc=p_asoa1j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
@@ -1044,7 +1067,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('asoa3j' )
-            ispcc=p_asoa3j-1                                                                                                                                 
+            ispcc=p_asoa3j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1057,7 +1080,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('asoa3i' )
-            ispcc=p_asoa3i-1                                                                                                                                 
+            ispcc=p_asoa3i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1070,7 +1093,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('asoa4j' )
-            ispcc=p_asoa4j-1                                                                                                                                 
+            ispcc=p_asoa4j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1083,7 +1106,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('asoa4i' )
-            ispcc=p_asoa4i-1                                                                                                                                 
+            ispcc=p_asoa4i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1096,7 +1119,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa1j' )
-            ispcc=p_bsoa1j-1                                                                                                                                 
+            ispcc=p_bsoa1j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1109,7 +1132,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa1i' )
-            ispcc=p_bsoa1i-1                                                                                                                                 
+            ispcc=p_bsoa1i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1122,7 +1145,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa2j' )
-            ispcc=p_bsoa2j-1                                                                                                                                 
+            ispcc=p_bsoa2j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1135,7 +1158,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa2i' )
-            ispcc=p_bsoa2i-1                                                                                                                                 
+            ispcc=p_bsoa2i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1148,7 +1171,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa3j' )
-            ispcc=p_bsoa3j-1                                                                                                                                 
+            ispcc=p_bsoa3j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1161,7 +1184,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa3i' )
-            ispcc=p_bsoa3i-1                                                                                                                                 
+            ispcc=p_bsoa3i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1174,7 +1197,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa4j' )
-            ispcc=p_bsoa4j-1                                                                                                                                 
+            ispcc=p_bsoa4j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1187,7 +1210,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('bsoa4i' )
-            ispcc=p_bsoa4i-1                                                                                                                                 
+            ispcc=p_bsoa4i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1200,7 +1223,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('orgpaj' )
-            ispcc=p_orgpaj-1                                                                                                                                 
+            ispcc=p_orgpaj-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1213,7 +1236,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('orgpai' )
-            ispcc=p_orgpai-1                                                                                                                                 
+            ispcc=p_orgpai-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1226,7 +1249,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('ecj' )
-            ispcc=p_ecj-1                                                                                                                                 
+            ispcc=p_ecj-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1239,7 +1262,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('eci' )
-            ispcc=p_eci-1                                                                                                                                 
+            ispcc=p_eci-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1252,7 +1275,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('p25j' )
-            ispcc=p_p25j-1                                                                                                                                 
+            ispcc=p_p25j-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1265,7 +1288,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('p25i' )
-            ispcc=p_p25i-1                                                                                                                                 
+            ispcc=p_p25i-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1278,7 +1301,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('antha' )
-            ispcc=p_antha-1                                                                                                                                 
+            ispcc=p_antha-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1291,7 +1314,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('seas' )
-            ispcc=p_seas-1                                                                                                                                 
+            ispcc=p_seas-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1304,33 +1327,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('soila' )
-            ispcc=p_soila-1                                                                                                                                 
-            be % v12(ispcc) % name = trim(adjustl(variable))
-            read (be_unit)  be12_evec_glo(ispcc,:,:)
-            read (be_unit)  be12_eval_glo(ispcc,:)
-            read (be_unit)  evec_loc
-            read (be_unit)  eval_loc
-            do j=1,nj
-               b = bin2d(1,j)
-               be12_evec_loc(ispcc,j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-               be12_eval_loc(ispcc,j,1:nk  ) = eval_loc(1:nk,b)
-            end do
-
-         case ('claj' )
-            ispcc=p_claj-1                                                                                                                                 
-            be % v12(ispcc) % name = trim(adjustl(variable))
-            read (be_unit)  be12_evec_glo(ispcc,:,:)
-            read (be_unit)  be12_eval_glo(ispcc,:)
-            read (be_unit)  evec_loc
-            read (be_unit)  eval_loc
-            do j=1,nj
-               b = bin2d(1,j)
-               be12_evec_loc(ispcc,j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-               be12_eval_loc(ispcc,j,1:nk  ) = eval_loc(1:nk,b)
-            end do
-
-         case ('clai' )
-            ispcc=p_clai-1                                                                                                                                 
+            ispcc=p_soila-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1343,7 +1340,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('so2' )
-            ispcc=p_so2-1                                                                                                                                 
+            ispcc=p_so2-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1356,7 +1353,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('no2' )
-            ispcc=p_no2-1                                                                                                                                 
+            ispcc=p_no2-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1369,7 +1366,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('o3' )
-            ispcc=p_o3-1                                                                                                                                 
+            ispcc=p_o3-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1382,7 +1379,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             end do
 
          case ('co' )
-            ispcc=p_co-1                                                                                                                                 
+            ispcc=p_co-1
             be % v12(ispcc) % name = trim(adjustl(variable))
             read (be_unit)  be12_evec_glo(ispcc,:,:)
             read (be_unit)  be12_eval_glo(ispcc,:)
@@ -1415,6 +1412,7 @@ subroutine da_setup_be_regional(xb, be, grid)
             call da_error(__FILE__,__LINE__,message(1:3))
          end select
 
+         print *, trim(adjustl(variable)), '  i =', i, ' , ispcc =', ispcc,' , nk =', nk
       end do ! num_cv_3d_basic+1 - num_cv_3d_basic+num_cv_3d_extra-1
       print*,"reading variables for chem_cv_options=108 (racm_soa_vbs_da) is done"
    end if ! ( chem_cv_options == 108 ) then    ! racm_soa_vbs_da
@@ -1632,6 +1630,12 @@ subroutine da_setup_be_regional(xb, be, grid)
             case ('naai' )
                ispcc=p_naai-1
                read(be_unit) be12_rf_lengthscale(ispcc,:)
+            case ('claj' )
+               ispcc=p_claj-1
+               read(be_unit) be12_rf_lengthscale(ispcc,:)
+            case ('clai' )
+               ispcc=p_clai-1
+               read(be_unit) be12_rf_lengthscale(ispcc,:)
             case ('asoa1j' )
                ispcc=p_asoa1j-1
                read(be_unit) be12_rf_lengthscale(ispcc,:)
@@ -1707,12 +1711,6 @@ subroutine da_setup_be_regional(xb, be, grid)
             case ('soila' )
                ispcc=p_soila-1
                read(be_unit) be12_rf_lengthscale(ispcc,:)
-            case ('claj' )
-               ispcc=p_claj-1
-               read(be_unit) be12_rf_lengthscale(ispcc,:)
-            case ('clai' )
-               ispcc=p_clai-1
-               read(be_unit) be12_rf_lengthscale(ispcc,:)
             case ('so2' )
                ispcc=p_so2-1
                read(be_unit) be12_rf_lengthscale(ispcc,:)
@@ -1727,9 +1725,7 @@ subroutine da_setup_be_regional(xb, be, grid)
                read(be_unit) be12_rf_lengthscale(ispcc,:)
             case ('w')
             if ( use_cv_w ) then
-               if ( trim(adjustl(variable)) == 'w' ) then
-                    read(be_unit) be11_rf_lengthscale
-               end if
+               read(be_unit) be11_rf_lengthscale
             end if
             case default;
                message(1)='Read problem in lengthscales in be.dat'
@@ -2054,16 +2050,19 @@ subroutine da_setup_be_regional(xb, be, grid)
             call da_check_eof_decomposition(be8_eval_glo(:),  be8_evec_glo(:,:),  be % v8 % name)
             call da_check_eof_decomposition(be9_eval_glo(:),  be9_evec_glo(:,:),  be % v9 % name)
             call da_check_eof_decomposition(be10_eval_glo(:), be10_evec_glo(:,:), be % v10 % name)
-         end if
 
-         if ( use_cv_w ) then
+            if ( use_cv_w ) then
                call da_check_eof_decomposition(be11_eval_glo(:), be11_evec_glo(:,:), be % v11 % name)
+            end if
          end if
 
          if ( chem_cv_options >= 1 ) then
             do i=1,num_cv_3d_chem
                 call da_check_eof_decomposition(be12_eval_glo(i,:),  be12_evec_glo(i,:,:),  be % v12(i) % name)
             end do
+            if ( use_cv_w ) then
+               call da_check_eof_decomposition(be11_eval_glo(:), be11_evec_glo(:,:), be % v11 % name)
+            end if
          end if
       end if
 
@@ -2110,7 +2109,7 @@ subroutine da_setup_be_regional(xb, be, grid)
          if ( use_cv_w ) then
             call da_get_vertical_truncation(max_vert_var11,be11_eval_glo(:),be % v11)
          end if
-      end if
+      endif !( chem_cv_options >= 1 ) then
 
       if (max_vert_var5 == 0.0) then
          be % v5 % mz = 0
@@ -2463,7 +2462,7 @@ subroutine da_setup_be_regional(xb, be, grid)
        write(be_print_unit,'("var_scaling3(it) = ",e12.5,2x,"len_scaling3(it) = "e12.5)')var_scaling3(it),len_scaling3(it)
        write(be_print_unit,'("var_scaling4(it) = ",e12.5,2x,"len_scaling4(it) = "e12.5)')var_scaling4(it),len_scaling4(it)
        write(be_print_unit,'("var_scaling5(it) = ",e12.5,2x,"len_scaling5(it) = "e12.5)')var_scaling5(it),len_scaling5(it)
-       write(be_print_unit,'("Background error statistics for this iteration:")')
+       write(be_print_unit,'("Background error statistics for this iteration in da_setup_be_regional.inc:")')
        write(be_print_unit,'("mz=",i3,2x,"be%v1%val:"/(10e12.5))') be%v1%mz, be%v1%val(1,:)
        write(be_print_unit,'("mz=",i3,2x,"be%v2%val:"/(10e12.5))') be%v2%mz, be%v2%val(1,:)
        write(be_print_unit,'("mz=",i3,2x,"be%v3%val:"/(10e12.5))') be%v3%mz, be%v3%val(1,:)
@@ -2480,7 +2479,7 @@ subroutine da_setup_be_regional(xb, be, grid)
 
        if ( chem_cv_options >= 1 ) then
        do i=1,num_cv_3d_chem
-          write(be_print_unit,'("mz=",i3,2x,"be%v12%val:"/(10e12.5))') be%v12(i)%mz, be%v12(i)%val(1,:)
+       write(be_print_unit,'("mz=",i3,2x,"be%v12%val at i=",a,i3,/(10e12.5))') be%v12(i)%mz, be%v12(i)%name,i,be%v12(i)%val(1,:)
        end do
        end if
 
@@ -2505,7 +2504,7 @@ subroutine da_setup_be_regional(xb, be, grid)
 
        if ( chem_cv_options >= 1 ) then
        do i=1,num_cv_3d_chem
-          write(be_print_unit,'("be%v12%rf_alpha:"/(5f12.5))')  be % v12(i) % rf_alpha(:5)
+          write(be_print_unit,'("be%v12%rf_alpha: i = ",i3,a,/(5f10.5))') i,be%v12(i)%name,be%v12(i)%rf_alpha(:10)
        end do
        end if
 
@@ -2538,28 +2537,21 @@ subroutine da_setup_be_regional(xb, be, grid)
           enddo
        endif !( cloud_cv_options >= 2 ) then
        if ( chem_cv_options >= 1 ) then
+          write(be_print_unit,*) 'be12_rf_lengthscale'
           do i = 1,kz
-             if (i == 1) then
-                write(be_print_unit,'(i3,2x,25f12.5)') i, be1_rf_lengthscale(i), be2_rf_lengthscale(i), &
-                   be3_rf_lengthscale(i), be4_rf_lengthscale(i), be5_rf_lengthscale(i), &
-                   be12_rf_lengthscale(1,i), be12_rf_lengthscale(2,i), be12_rf_lengthscale(3,i), be12_rf_lengthscale(4,i) , &
-                   be12_rf_lengthscale(5,i), be12_rf_lengthscale(6,i), be12_rf_lengthscale(7,i), be12_rf_lengthscale(8,i) , &
-                   be12_rf_lengthscale(9,i), be12_rf_lengthscale(10,i), be12_rf_lengthscale(11,i), be12_rf_lengthscale(12,i) , &
-                   be12_rf_lengthscale(13,i), be12_rf_lengthscale(14,i), be12_rf_lengthscale(15,i), be12_rf_lengthscale(16,i), &
-                   be12_rf_lengthscale(17,i), be12_rf_lengthscale(18,i), be12_rf_lengthscale(19,i), &
-                   be11_rf_lengthscale(i)
-             else
-                write(be_print_unit,'(i3,2x,4f12.3,5x,20f12.5)') i, be1_rf_lengthscale(i), be2_rf_lengthscale(i), &
-                   be3_rf_lengthscale(i), be4_rf_lengthscale(i),  &
-                   be12_rf_lengthscale(1,i), be12_rf_lengthscale(2,i), be12_rf_lengthscale(3,i), be12_rf_lengthscale(4,i) , &
-                   be12_rf_lengthscale(5,i), be12_rf_lengthscale(6,i), be12_rf_lengthscale(7,i), be12_rf_lengthscale(8,i) , &
-                   be12_rf_lengthscale(9,i), be12_rf_lengthscale(10,i), be12_rf_lengthscale(11,i), be12_rf_lengthscale(12,i) , &
-                   be12_rf_lengthscale(13,i), be12_rf_lengthscale(14,i), be12_rf_lengthscale(15,i), be12_rf_lengthscale(16,i), &
-                   be12_rf_lengthscale(17,i), be12_rf_lengthscale(18,i), be12_rf_lengthscale(19,i), &
-                   be11_rf_lengthscale(i)
-             endif
+           write(be_print_unit,'(i3,9x,10e12.5/10e12.5/10e12.5/10e12.5)') i, &
+                 be12_rf_lengthscale(1,i), be12_rf_lengthscale(2,i), be12_rf_lengthscale(3,i), be12_rf_lengthscale(4,i),&
+                 be12_rf_lengthscale(5,i), be12_rf_lengthscale(6,i), be12_rf_lengthscale(7,i), be12_rf_lengthscale(8,i),&
+                 be12_rf_lengthscale(9,i), be12_rf_lengthscale(10,i), be12_rf_lengthscale(11,i), be12_rf_lengthscale(12,i),&
+                 be12_rf_lengthscale(13,i), be12_rf_lengthscale(14,i), be12_rf_lengthscale(15,i), be12_rf_lengthscale(16,i),&
+                 be12_rf_lengthscale(17,i), be12_rf_lengthscale(18,i), be12_rf_lengthscale(19,i), be12_rf_lengthscale(20,i),&
+                 be12_rf_lengthscale(21,i), be12_rf_lengthscale(22,i), be12_rf_lengthscale(23,i), be12_rf_lengthscale(24,i),&
+                 be12_rf_lengthscale(25,i), be12_rf_lengthscale(26,i), be12_rf_lengthscale(27,i), be12_rf_lengthscale(28,i),&
+                 be12_rf_lengthscale(29,i), be12_rf_lengthscale(30,i), be12_rf_lengthscale(31,i), be12_rf_lengthscale(32,i),&
+                 be12_rf_lengthscale(33,i), be12_rf_lengthscale(34,i), be12_rf_lengthscale(35,i), be12_rf_lengthscale(36,i),&
+                 be12_rf_lengthscale(37,i), be12_rf_lengthscale(38,i), be12_rf_lengthscale(39,i), be11_rf_lengthscale(i)
           enddo
-       end if   !  ( chem_cv_options == 112 ) then
+       end if   !  if ( chem_cv_options >= 1 ) 
 
    endif ! print_detail_be
 

@@ -157,7 +157,7 @@ subroutine da_transfer_xatowrf(grid, config_flags)
         end do
       end do
 
-   endif 
+   endif    !  if ( .not. var4d ) 
 
    ! update perturbation pressure
 
@@ -648,7 +648,8 @@ subroutine da_transfer_xatowrf(grid, config_flags)
             'minval(q_cgrid(its:ite,jts:jte,k))  =', minval(q_cgrid(its:ite,jts:jte,k))
 #endif
       end do
-   end if
+   end if  !  if (print_detail_xa) then
+
 #ifdef VAR4D
    IF ( var4d ) THEN
 
@@ -711,7 +712,6 @@ subroutine da_transfer_xatowrf(grid, config_flags)
       grid%moist_btxe = grid%moist_btxe + model_grid%g_moist_btxe
       grid%moist_btys = grid%moist_btys + model_grid%g_moist_btys
       grid%moist_btye = grid%moist_btye + model_grid%g_moist_btye
-#endif
 
 #if (WRF_CHEM == 1)
       ! Don't ever want scale < 0; alpha < 0 is no problem
@@ -734,6 +734,8 @@ subroutine da_transfer_xatowrf(grid, config_flags)
             end do
          end do
       end do
+#endif
+   ENDIF !  IF ( var4d ) 
 #endif
 
 #if (WRF_CHEM == 1)

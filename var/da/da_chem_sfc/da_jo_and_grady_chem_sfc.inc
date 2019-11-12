@@ -13,11 +13,6 @@ subroutine da_jo_and_grady_chem_sfc(iv, re, jo, jo_grad_y)
 
    integer        :: n,ichem
 
-   ! the following "global" objects are used only when testing
-   type (iv_type) :: iv_glob         ! Global Innovation vector (O-B).
-   type (y_type)  :: re_glob         ! Global Residual vector (O-A).
-   type (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
-
    if (trace_use_dull) call da_trace_entry("da_jo_and_grady_chem_sfc")
 
    jo % chemic_surf = 0.0
@@ -36,16 +31,17 @@ subroutine da_jo_and_grady_chem_sfc(iv, re, jo, jo_grad_y)
 
    do ichem = PARAM_FIRST_SCALAR, num_chemic_surf
    do n=1, iv%info(chemic_surf)%nlocal
-      jo_grad_y%chemic_surf(n)%chem(ichem) = -re%chemic_surf(n)%chem(ichem) / (iv%chemic_surf(n)%chem(ichem)%error * iv%chemic_surf(n)%chem(ichem)%error)
-   end do
-   end do
+      jo_grad_y%chemic_surf(n)%chem(ichem) = -re%chemic_surf(n)%chem(ichem) / &
+                                            (iv%chemic_surf(n)%chem(ichem)%error * iv%chemic_surf(n)%chem(ichem)%error)
 
-      call da_jo_chem_sfc(iv, re, jo_grad_y, jo)
+      if (iv%info(chemic_surf)%proc_domain(1,n)) then
+          jo % chemic_surf = jo % chemic_surf - re%chemic_surf(n)%chem(ichem) * jo_grad_y%chemic_surf(n)%chem(ichem)
+      end if
+   end do
+   end do
 
    jo % chemic_surf = 0.5 * jo % chemic_surf
 
    if (trace_use_dull) call da_trace_exit("da_jo_and_grady_chem_sfc")
 
 end subroutine da_jo_and_grady_chem_sfc
-
-

@@ -319,7 +319,7 @@ use module_state_description, only : num_chem, PARAM_FIRST_SCALAR               
 #if (WRF_CHEM == 1)
       write(unit=stats_unit2, fmt='(/a/)') ' Maximum of gridded analysis increments'
       select case ( chem_cv_options )
-       case ( 112 )
+       case ( 108 )
           write(unit=stats_unit2, fmt='(11a/)') &
                ' Lvl         ', &
                'so4aj    i    j          ', &

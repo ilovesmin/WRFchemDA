@@ -328,12 +328,13 @@ subroutine da_scale_background_errors ( be, it )
       if(allocated(rf_len11))deallocate(rf_len11)
     endif
 
+if(allocated(v11_val))  deallocate(v11_val)
+if(allocated(rf_len11)) deallocate(rf_len11)
+
 #if (WRF_CHEM == 1)
     if (chem_cv_options >=1) then
-    if(allocated(v11_val))  deallocate(v11_val)
-    if(allocated(v12_val))  deallocate(v12_val)
-    if(allocated(rf_len11)) deallocate(rf_len11)
-    if(allocated(rf_len12)) deallocate(rf_len12)
+        if(allocated(v12_val))  deallocate(v12_val)
+        if(allocated(rf_len12)) deallocate(rf_len12)
     endif !(chem_cv_options >=1) then
 #endif
 

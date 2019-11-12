@@ -176,7 +176,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       ! Sanity check
       !!!!!!!!!!!!!!!!!!!
       do ichem = PARAM_FIRST_SCALAR, num_chemic_surf
-      if (platform%chem(ichem)%inv==-999.or.abs(platform%chem(ichem)%inv)>=max_pm) then
+      if (platform%chem(ichem)%inv<=0.or.abs(platform%chem(ichem)%inv)>=max_pm) then
           platform%chem(ichem)%inv=missing_r
       else
           platform%chem(ichem)%qc = 0

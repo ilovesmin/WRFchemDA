@@ -23,66 +23,75 @@ subroutine da_transform_xtoy_chem_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    if (sfc_assi_options == sfc_assi_options_1) then
 
-      allocate (model_chemic(iv%info(chemic_surf)%n1:iv%info(chemic_surf)%n2,num_chem))
+      allocate (model_rho        (iv%info(chemic_surf)%n1:iv%info(chemic_surf)%n2,num_chem))
+      allocate (model_chemic     (iv%info(chemic_surf)%n1:iv%info(chemic_surf)%n2,num_chem))
       allocate (model_chemic_surf(iv%info(chemic_surf)%n1:iv%info(chemic_surf)%n2,num_chemic_surf))
-      allocate (model_rho(iv%info(chemic_surf)%n1:iv%info(chemic_surf)%n2,num_chem))
 
-      jo_grad_x%chem_ic = 0.0
+      model_rho = 0.0
       model_chemic = 0.0
       model_chemic_surf = 0.0
-      model_rho = 0.0
 
       do ichem = PARAM_FIRST_SCALAR, num_chemic_surf
-      ! [1.2] Interpolate horizontally:
         do n=iv%info(chemic_surf)%n1,iv%info(chemic_surf)%n2
-           model_chemic_surf(n,ichem)  = jo_grad_y%chemic_surf(n)%chem(ichem)
+           if(iv%chemic_surf(n)%chem(ichem)%qc >= obs_qc_pointer) then
+           model_chemic_surf(n,ichem)  = model_chemic_surf(n,ichem) + jo_grad_y%chemic_surf(n)%chem(ichem)
+           endif
+           jo_grad_y%chemic_surf(n)%chem(ichem) = 0.0
         end do
+        !print*,'da_transform_xtoy_chem_sfc_adj: ichem =',ichem
       end do
 
+      ! [1.2] Interpolate horizontally:
       do ichem = PARAM_FIRST_SCALAR ,num_chem
          call da_interp_lin_2d (grid%xb%rho(:,:,1),  iv%info(chemic_surf), 1, model_rho(:,ichem))
       end do
 
-      if (chemicda_opt == 4 .or. chemicda_opt == 5 ) then  ! ! unit conversion - common for all chem_cv_options
-        model_chemic(:,p_chem_ic_so2)=model_rho(:,p_chem_ic_so2)*(model_chemic_surf(:,p_chemsi_so2))*(64.06/28.964*1000)
-        model_chemic(:,p_chem_ic_no2)=model_rho(:,p_chem_ic_no2)*(model_chemic_surf(:,p_chemsi_no2))*(46.01/28.964*1000)
-        model_chemic(:,p_chem_ic_o3 )=model_rho(:,p_chem_ic_o3 )*(model_chemic_surf(:,p_chemsi_o3 ))*(48.00/28.964*1000)
-        model_chemic(:,p_chem_ic_co )=model_rho(:,p_chem_ic_co )*(model_chemic_surf(:,p_chemsi_co ))*(28.01/28.964*1000)
+     if (chem_cv_options == 108) then       ! racm_soa_vbs_da
 
-        do ichem = PARAM_FIRST_SCALAR, num_chem
-          call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
-        end do
-      endif !(chemicda_opt == 4 .or. chemicda_opt == 5) then
+       if ( chemicda_opt == 1 ) then        ! pm2.5 only
 
-     if (chem_cv_options == 108) then  ! racm_soa_vbs_da
-
-       if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then 
-
-           ! pm10
-           do n = p_chem_ic_so4aj, p_chem_ic_soila
-              model_chemic(:,n) = model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm10)
+           do n = p_chem_ic_so4aj, p_chem_ic_p25i
+              model_chemic(:,n) = model_chemic(:,n) + model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm25)
            enddo
 
-       endif  !  if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5) 
+       else if ( chemicda_opt == 2 ) then   ! pm10 only
 
-       if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then
+           do n = p_chem_ic_so4aj, p_chem_ic_soila
+              model_chemic(:,n) = model_chemic(:,n) + model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm10)
+           enddo
+
+       else if ( chemicda_opt == 3 .or. chemicda_opt == 5) then 
 
            ! pm2.5
            do n = p_chem_ic_so4aj, p_chem_ic_p25i
-              model_chemic(:,n) = model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm25)
+              model_chemic(:,n) = model_chemic(:,n) + model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm25)
            enddo
 
-        endif !  if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 5)
-       
-        do ichem = PARAM_FIRST_SCALAR, num_chem
+           ! pm10
+           do n = p_chem_ic_so4aj, p_chem_ic_soila
+              model_chemic(:,n) = model_chemic(:,n) + model_rho(:,n)*model_chemic_surf(:,p_chemsi_pm10)
+           enddo
+
+       endif
+
+       if ( chemicda_opt == 4 .or. chemicda_opt == 5) then 
+
+        model_chemic(:,p_chem_ic_so2)=model_chemic_surf(:,p_chemsi_so2)
+        model_chemic(:,p_chem_ic_no2)=model_chemic_surf(:,p_chemsi_no2)
+        model_chemic(:,p_chem_ic_o3 )=model_chemic_surf(:,p_chemsi_o3 )
+        model_chemic(:,p_chem_ic_co )=model_chemic_surf(:,p_chemsi_co )
+
+       endif
+
+       do ichem = PARAM_FIRST_SCALAR, num_chem
           call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
-        end do
+       end do
 
      end if !(chem_cv_options == 108) then  ! racm_soa_vbs_da
 
+     deallocate(model_rho)
      deallocate(model_chemic)
      deallocate(model_chemic_surf)
-     deallocate(model_rho)
 
    end if !(sfc_assi_options == sfc_assi_options_1)
 
