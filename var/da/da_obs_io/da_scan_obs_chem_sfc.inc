@@ -216,14 +216,14 @@ subroutine da_scan_obs_chem_sfc (iv, filename, grid)
          cycle reports
       end if
 
-      if (print_detail_obs) then
-         ! Simplistic approach, could be improved to get it all done on PE 0
-         if (.NOT. outside) then
-            write(unit=stdout,fmt='(A,I5,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
-               "Report",report," at",platform%info%lon,"E",platform%info%lat, &
-               "N on processor", myproc,", position", platform%loc%x,platform%loc%y
-         end if
-      end if
+!      if (print_detail_obs) then
+!         ! Simplistic approach, could be improved to get it all done on PE 0
+!         if (.NOT. outside) then
+!            write(unit=stdout,fmt='(A,I5,A,A,3X,2F10.6,5F8.2)') &
+!               "Report",report," at ",trim(platform%info%id),platform%info%lon,platform%info%lat, &
+!               platform%loc%x,platform%loc%y,platform%chem(PARAM_FIRST_SCALAR)%inv, pm25, pm10
+!         end if
+!      end if
 
       call da_get_julian_time (iyear,imonth,iday,ihour,imin,analysis_time)
       tdiff = abs((obs_time - analysis_time)-0.02)

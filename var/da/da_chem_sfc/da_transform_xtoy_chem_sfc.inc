@@ -38,38 +38,54 @@ subroutine da_transform_xtoy_chem_sfc (grid, iv, y)
 
       if (chem_cv_options == 108) then      ! racm_soa_vbs_da
 
-       if ( chemicda_opt == 1 ) then        ! pm2.5 only
+         if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 4) then    ! pm2.5
+             model_chemic_surf(:,p_chemsi_pm25)=model_rho(:,p_chem_ic_so4aj) * &
+                                            (model_chemic(:,p_chem_ic_so4aj) +model_chemic(:,p_chem_ic_so4ai) + &
+                                             model_chemic(:,p_chem_ic_nh4aj) +model_chemic(:,p_chem_ic_nh4ai) + &
+                                             model_chemic(:,p_chem_ic_no3aj) +model_chemic(:,p_chem_ic_no3ai) + &
+                                             model_chemic(:,p_chem_ic_naaj ) +model_chemic(:,p_chem_ic_naai ) + &
+                                             model_chemic(:,p_chem_ic_claj ) +model_chemic(:,p_chem_ic_clai ) + &
+                                             model_chemic(:,p_chem_ic_asoa1j)+model_chemic(:,p_chem_ic_asoa1i)+ &
+                                             model_chemic(:,p_chem_ic_asoa2j)+model_chemic(:,p_chem_ic_asoa2i)+ &
+                                             model_chemic(:,p_chem_ic_asoa3j)+model_chemic(:,p_chem_ic_asoa3i)+ &
+                                             model_chemic(:,p_chem_ic_asoa4j)+model_chemic(:,p_chem_ic_asoa4i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa1j)+model_chemic(:,p_chem_ic_bsoa1i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa2j)+model_chemic(:,p_chem_ic_bsoa2i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa3j)+model_chemic(:,p_chem_ic_bsoa3i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa4j)+model_chemic(:,p_chem_ic_bsoa4i)+ &
+                                             model_chemic(:,p_chem_ic_orgpaj)+model_chemic(:,p_chem_ic_orgpai)+ &
+                                             model_chemic(:,p_chem_ic_ecj   )+model_chemic(:,p_chem_ic_eci   )+ &
+                                             model_chemic(:,p_chem_ic_p25j  )+model_chemic(:,p_chem_ic_p25i  ))
+         endif  !(chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 4) 
 
-           do n = p_chem_ic_so4aj, p_chem_ic_p25i
-              model_chemic_surf(:,p_chemsi_pm25)=model_chemic_surf(:,p_chemsi_pm25)+model_rho(:,n)*model_chemic(:,n)
-           enddo
+         if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4) then    ! pm10
+             model_chemic_surf(:,p_chemsi_pm10)=model_rho(:,p_chem_ic_so4aj) * &
+                                            (model_chemic(:,p_chem_ic_so4aj) +model_chemic(:,p_chem_ic_so4ai) + &
+                                             model_chemic(:,p_chem_ic_nh4aj) +model_chemic(:,p_chem_ic_nh4ai) + &
+                                             model_chemic(:,p_chem_ic_no3aj) +model_chemic(:,p_chem_ic_no3ai) + &
+                                             model_chemic(:,p_chem_ic_naaj ) +model_chemic(:,p_chem_ic_naai ) + &
+                                             model_chemic(:,p_chem_ic_claj ) +model_chemic(:,p_chem_ic_clai ) + &
+                                             model_chemic(:,p_chem_ic_asoa1j)+model_chemic(:,p_chem_ic_asoa1i)+ &
+                                             model_chemic(:,p_chem_ic_asoa2j)+model_chemic(:,p_chem_ic_asoa2i)+ &
+                                             model_chemic(:,p_chem_ic_asoa3j)+model_chemic(:,p_chem_ic_asoa3i)+ &
+                                             model_chemic(:,p_chem_ic_asoa4j)+model_chemic(:,p_chem_ic_asoa4i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa1j)+model_chemic(:,p_chem_ic_bsoa1i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa2j)+model_chemic(:,p_chem_ic_bsoa2i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa3j)+model_chemic(:,p_chem_ic_bsoa3i)+ &
+                                             model_chemic(:,p_chem_ic_bsoa4j)+model_chemic(:,p_chem_ic_bsoa4i)+ &
+                                             model_chemic(:,p_chem_ic_orgpaj)+model_chemic(:,p_chem_ic_orgpai)+ &
+                                             model_chemic(:,p_chem_ic_ecj   )+model_chemic(:,p_chem_ic_eci   )+ &
+                                             model_chemic(:,p_chem_ic_p25j  )+model_chemic(:,p_chem_ic_p25i  )+ &
+                                             model_chemic(:,p_chem_ic_antha )+model_chemic(:,p_chem_ic_seas ) + &
+                                             model_chemic(:,p_chem_ic_soila ))
+         endif !(chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4)
 
-       else if ( chemicda_opt == 2 ) then   ! pm10 only
-
-           do n = p_chem_ic_so4aj, p_chem_ic_soila
-              model_chemic_surf(:,p_chemsi_pm10)=model_chemic_surf(:,p_chemsi_pm10)+model_rho(:,n)*model_chemic(:,n)
-           enddo
-
-       else if ( chemicda_opt == 3 .or. chemicda_opt == 5) then
-
-           do n = p_chem_ic_so4aj, p_chem_ic_p25i
-              model_chemic_surf(:,p_chemsi_pm25)=model_chemic_surf(:,p_chemsi_pm25)+model_rho(:,n)*model_chemic(:,n)
-           enddo
-
-           do n = p_chem_ic_so4aj, p_chem_ic_soila
-              model_chemic_surf(:,p_chemsi_pm10)=model_chemic_surf(:,p_chemsi_pm10)+model_rho(:,n)*model_chemic(:,n)
-           enddo
-
-       endif
-
-       if ( chemicda_opt == 4 .or. chemicda_opt == 5 ) then
-
-          model_chemic_surf(:,p_chemsi_so2)=model_chemic(:,p_chem_ic_so2)
-          model_chemic_surf(:,p_chemsi_no2)=model_chemic(:,p_chem_ic_no2)
-          model_chemic_surf(:,p_chemsi_o3) =model_chemic(:,p_chem_ic_o3 )
-          model_chemic_surf(:,p_chemsi_co) =model_chemic(:,p_chem_ic_co )
-
-       endif
+         if ( chemicda_opt == 4 .or. chemicda_opt == 5 ) then
+              model_chemic_surf(:,p_chemsi_so2)=model_chemic(:,p_chem_ic_so2)
+              model_chemic_surf(:,p_chemsi_no2)=model_chemic(:,p_chem_ic_no2)
+              model_chemic_surf(:,p_chemsi_o3) =model_chemic(:,p_chem_ic_o3 )
+              model_chemic_surf(:,p_chemsi_co) =model_chemic(:,p_chem_ic_co )
+         endif
 
       endif !(chem_cv_options == 108)
 

@@ -83,7 +83,7 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
    obs_index = chemic_surf
 
    write(*,*) "da_read_obs_chem_sfc: pm obs are treated as missing if >= ", max_pm
-   write(*,*) "da_read_obs_chem_sfc: num_chemic_surf, chemic_surf =", num_chemic_surf,chemic_surf
+   write(*,*) "da_read_obs_chem_sfc: num_chemic_surf, chemic_surf, chemicda_opt =", num_chemic_surf,chemic_surf, chemicda_opt
 
    imin=0    ! minutes
 
@@ -166,8 +166,8 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       case ( 9 )
             platform%chem(PARAM_FIRST_SCALAR  )%inv = co 
             platform%info%name                      = "co"
-            if(isite < 10000) & ! co at Chinese sites
-            platform%chem(PARAM_FIRST_SCALAR  )%inv = platform%chem(PARAM_FIRST_SCALAR  )%inv*1000 !!! mg to ug !!! 
+            !if(isite < 10000) & ! co at Chinese sites
+            !platform%chem(PARAM_FIRST_SCALAR  )%inv = platform%chem(PARAM_FIRST_SCALAR  )%inv*1000 !!! mg to ug !!! 
       case default
             platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
             platform%info%name                      = ""
@@ -238,10 +238,10 @@ subroutine da_read_obs_chem_sfc (iv, filename, grid)
       if (print_detail_obs) then
          ! Simplistic approach, could be improved to get it all done on PE 0
          if (.NOT. outside) then
-            write(unit=stdout,fmt='(A,I5,A,F8.2,A,F8.2,A,I3,A,2F8.2,5x,F12.1)') &
-               "Report",report," at",platform%info%lon,"E",platform%info%lat, &
-               "N on processor", myproc,", position", platform%loc%x,platform%loc%y, &
-               platform%chem(PARAM_FIRST_SCALAR)%inv !, pm25
+           write(unit=stdout,fmt='(A,I5,A,A,3X,2F10.6,2f8.2,2I4,F12.2,2F8.2,4F9.3)') &
+               "Report",report," at ",trim(platform%info%id),platform%info%lon,platform%info%lat, &
+               platform%loc%x, platform%loc%y, platform%loc%i,  platform%loc%j,  &
+               platform%chem(PARAM_FIRST_SCALAR)%inv, pm25, pm10, so2, no2, o3, co
          end if
       end if
 

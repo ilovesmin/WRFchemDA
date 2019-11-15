@@ -13,7 +13,7 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
 
    if (trace_use_dull) call da_trace_entry("da_print_stats_chem_sfc")
 
-   if (chemicda_opt == 1 ) then
+if (chemicda_opt == 1 ) then
    write(unit=stats_unit, fmt='(2a/)') &
       '   var             ', &
       'pm25 (ug/kg)     n         k    '
@@ -27,7 +27,7 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
       ' Average     : ', stats%average%chem(p_chemsi_pm25)/real(nchem), &
       '    RMSE     : ', sqrt(stats%rms_err%chem(p_chemsi_pm25)/real(nchem))
 
-   else if (chemicda_opt == 2 ) then
+else if (chemicda_opt == 2 ) then
    write(unit=stats_unit, fmt='(2a/)') &
       '   var             ', &
       'pm10 (ug/kg)     n         k    '
@@ -41,7 +41,7 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
       ' Average     : ', stats%average%chem(p_chemsi_pm10)/real(nchem), &
       '    RMSE     : ', sqrt(stats%rms_err%chem(p_chemsi_pm10)/real(nchem))
 
-   else if (chemicda_opt == 3) then
+else if (chemicda_opt == 3) then
    if (present(ichem).and.ichem == PARAM_FIRST_SCALAR) then
    write(unit=stats_unit, fmt='(2a/)') &
       '   var             ', &
@@ -69,10 +69,9 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
    write(unit=stats_unit, fmt='((a,(f12.4,10x)))') &
       ' Average     : ', stats%average%chem(p_chemsi_pm10)/real(nchem), &
       '    RMSE     : ', sqrt(stats%rms_err%chem(p_chemsi_pm10)/real(nchem))
-
    end if
 
-   else if (chemicda_opt == 5) then
+else if (chemicda_opt == 5) then
    if (present(ichem).and.ichem == PARAM_FIRST_SCALAR) then
    write(unit=stats_unit, fmt='(2a/)') &
       '   var             ', &
@@ -131,7 +130,7 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
 
    end if
 
-   else if (chemicda_opt == 4) then
+else if (chemicda_opt == 4) then
    if (present(ichem).and.ichem == PARAM_FIRST_SCALAR) then
    write(unit=stats_unit, fmt='(2a/)') &
       '   var             ', &
@@ -217,7 +216,7 @@ subroutine da_print_stats_chem_sfc(stats_unit, nchem, stats, ichem)
       '    RMSE     : ', sqrt(stats%rms_err%chem(p_chemsi_co)/real(nchem))
 
    end if
-   end if
+end if
 
    if (trace_use_dull) call da_trace_exit("da_print_stats_chem_sfc")
 

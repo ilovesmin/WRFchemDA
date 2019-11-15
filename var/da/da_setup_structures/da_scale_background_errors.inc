@@ -35,39 +35,28 @@ subroutine da_scale_background_errors ( be, it )
       read(be_rf_unit) kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, &
                        v6_mz, v7_mz, v8_mz, v9_mz, v10_mz,v11_mz,      &
                        ds   
-    else
-      read(be_rf_unit) kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, ds
-    endif
-
 #if (WRF_CHEM == 1)
     write(*,*) 'da_scale_background_errors: istart, num_chem =',PARAM_FIRST_SCALAR, num_chem
-    if(chem_cv_options >= 1) then
+    else if(chem_cv_options >= 1) then
       read(be_rf_unit)  kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, v12_mz(1:num_chem), &
                         v11_mz, ds
-    endif
+
 !    if(chem_cv_options == 108 ) then    ! racm_soa_vbs_da: num_chem = 39 (= 4 gas species + 35 aerosol species)
 !      read(be_rf_unit)  kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, v12_mz(1:num_chem), &
 !                        v11_mz, ds
 !    else if(chem_cv_options == 112 ) then    ! mozcart_da: num_chem = 19
 !      read(be_rf_unit)  kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, v12_mz(1:num_chem), &
-!                       v12_mz(1), v12_mz(2), v12_mz(3), v12_mz(4), v12_mz(5), &
-!                       v12_mz(6), v12_mz(7), v12_mz(8), v12_mz(9), v12_mz(10), &
-!                       v12_mz(11), v12_mz(12), v12_mz(13), v12_mz(14), v12_mz(15), &
-!                       v12_mz(16), v12_mz(17), v12_mz(18), v12_mz(19), &
 !                        v11_mz, ds
-! Ha: FIXME - why not including so2, no2, co, o3 to make 36 instead of 32?
 !    else if(chem_cv_options == 7 ) then      ! cbmz_mosaic_4bin_da
 !      read(be_rf_unit)  kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, v12_mz(1:num_chem), &
-!                       v12_mz(1), v12_mz(2), v12_mz(3), v12_mz(4), v12_mz(5), &
-!                       v12_mz(6), v12_mz(7), v12_mz(8), v12_mz(9), v12_mz(10), &
-!                       v12_mz(11), v12_mz(12), v12_mz(13), v12_mz(14), v12_mz(15), &
-!                       v12_mz(16), v12_mz(17), v12_mz(18), v12_mz(19), v12_mz(20), &
-!                       v12_mz(21), v12_mz(22), v12_mz(23), v12_mz(24), &
-!                       v12_mz(25), v12_mz(26), v12_mz(27), v12_mz(28), &
 !                       v12_mz(29), v12_mz(30), v12_mz(31), v12_mz(32), &
 !                        v11_mz, ds  
 !    endif
 #endif
+
+    else
+      read(be_rf_unit) kz, jy, ix, v1_mz, v2_mz, v3_mz, v4_mz, v5_mz, ds
+    endif
 
     allocate ( v1_val (1:jy,1:v1_mz) )
     allocate ( rf_len1(1:kz) )
@@ -127,66 +116,6 @@ subroutine da_scale_background_errors ( be, it )
    endif  !(chem_cv_options >= 1) then
 #endif
       
-!   if(chem_cv_options == 108 ) then    ! racm_soa_vbs_da: 39 = 4 gas species + 35 aerosol species
-!      read(be_rf_unit) v1_val , v2_val , v3_val , v4_val , v5_val , &
-!                       v12_val(1,:,1:v12_mz(1)),  v12_val(2,:,1:v12_mz(2)),  v12_val(3,:,1:v12_mz(3)),  v12_val(4,:,1:v12_mz(4)), &
-!                       v12_val(5,:,1:v12_mz(5)),  v12_val(6,:,1:v12_mz(6)),  v12_val(7,:,1:v12_mz(7)),  v12_val(8,:,1:v12_mz(8)), &
-!                       v12_val(9,:,1:v12_mz(9)),  v12_val(10,:,1:v12_mz(10)),  v12_val(11,:,1:v12_mz(11)),  v12_val(12,:,1:v12_mz(12)), &
-!                       v12_val(13,:,1:v12_mz(13)),  v12_val(14,:,1:v12_mz(14)),  v12_val(15,:,1:v12_mz(15)),  v12_val(16,:,1:v12_mz(16)), &
-!                       v12_val(17,:,1:v12_mz(17)),  v12_val(18,:,1:v12_mz(18)),  v12_val(19,:,1:v12_mz(19)), v12_val(20,:,1:v12_mz(20)), &
-!                       v12_val(21,:,1:v12_mz(21)),  v12_val(22,:,1:v12_mz(22)),  v12_val(23,:,1:v12_mz(23)), v12_val(24,:,1:v12_mz(24)), &
-!                       v12_val(25,:,1:v12_mz(25)),  v12_val(26,:,1:v12_mz(26)),  v12_val(27,:,1:v12_mz(27)), v12_val(28,:,1:v12_mz(28)), &
-!                       v12_val(29,:,1:v12_mz(29)),  v12_val(30,:,1:v12_mz(30)),  v12_val(31,:,1:v12_mz(31)), v12_val(32,:,1:v12_mz(32)), &
-!                       v12_val(33,:,1:v12_mz(33)),  v12_val(34,:,1:v12_mz(34)),  v12_val(35,:,1:v12_mz(35)), v12_val(36,:,1:v12_mz(36)), &
-!                       v12_val(37,:,1:v12_mz(37)),  v12_val(38,:,1:v12_mz(38)),  v12_val(39,:,1:v12_mz(39)), &
-!                       v11_val, &
-!                       rf_len1, rf_len2, rf_len3, rf_len4, rf_len5, &
-!                       rf_len12(1,:), rf_len12(2,:), rf_len12(3,:), rf_len12(4,:), rf_len12(5,:), &
-!                       rf_len12(6,:), rf_len12(7,:), rf_len12(8,:), rf_len12(9,:), rf_len12(10,:), &
-!                       rf_len12(11,:), rf_len12(12,:), rf_len12(13,:), rf_len12(14,:), rf_len12(15,:), &
-!                       rf_len12(16,:), rf_len12(17,:), rf_len12(18,:), rf_len12(19,:), rf_len12(20,:), &
-!                       rf_len12(21,:), rf_len12(22,:), rf_len12(23,:), rf_len12(24,:), &
-!                       rf_len12(25,:), rf_len12(26,:), rf_len12(27,:), rf_len12(28,:), &
-!                       rf_len12(29,:), rf_len12(30,:), rf_len12(31,:), rf_len12(32,:), &
-!                       rf_len12(33,:), rf_len12(34,:), rf_len12(35,:), rf_len12(36,:), &
-!                       rf_len12(37,:), rf_len12(38,:), rf_len12(39,:), &
-!                       rf_len11 
-!   else if(chem_cv_options == 112 ) then    ! mozcart_da
-!      read(be_rf_unit) v1_val , v2_val , v3_val , v4_val , v5_val , &
-!                       v12_val(1,:,1:v12_mz(1)),  v12_val(2,:,1:v12_mz(2)),  v12_val(3,:,1:v12_mz(3)),  v12_val(4,:,1:v12_mz(4)), &
-!                       v12_val(5,:,1:v12_mz(5)),  v12_val(6,:,1:v12_mz(6)),  v12_val(7,:,1:v12_mz(7)),  v12_val(8,:,1:v12_mz(8)), &
-!                       v12_val(9,:,1:v12_mz(9)),  v12_val(10,:,1:v12_mz(10)),  v12_val(11,:,1:v12_mz(11)),  v12_val(12,:,1:v12_mz(12)), &
-!                       v12_val(13,:,1:v12_mz(13)),  v12_val(14,:,1:v12_mz(14)),  v12_val(15,:,1:v12_mz(15)),  v12_val(16,:,1:v12_mz(16)), &
-!                       v12_val(17,:,1:v12_mz(17)),  v12_val(18,:,1:v12_mz(18)),  v12_val(19,:,1:v12_mz(19)), &
-!                       v11_val, &
-!                       rf_len1, rf_len2, rf_len3, rf_len4, rf_len5, &
-!                       rf_len12(1,:), rf_len12(2,:), rf_len12(3,:), rf_len12(4,:), rf_len12(5,:), &
-!                       rf_len12(6,:), rf_len12(7,:), rf_len12(8,:), rf_len12(9,:), rf_len12(10,:), &
-!                       rf_len12(11,:), rf_len12(12,:), rf_len12(13,:), rf_len12(14,:), rf_len12(15,:), &
-!                       rf_len12(16,:), rf_len12(17,:), rf_len12(18,:), rf_len12(19,:), &
-!                       rf_len11 
-!   else if(chem_cv_options == 7 ) then      ! cbmz_mosaic_4bin_da
-!      read(be_rf_unit) v1_val , v2_val , v3_val , v4_val , v5_val , &
-!                       v12_val(1,:,1:v12_mz(1)),  v12_val(2,:,1:v12_mz(2)),  v12_val(3,:,1:v12_mz(3)),  v12_val(4,:,1:v12_mz(4)), &
-!                       v12_val(5,:,1:v12_mz(5)),  v12_val(6,:,1:v12_mz(6)),  v12_val(7,:,1:v12_mz(7)),  v12_val(8,:,1:v12_mz(8)), &
-!                       v12_val(9,:,1:v12_mz(9)),  v12_val(10,:,1:v12_mz(10)),  v12_val(11,:,1:v12_mz(11)),  v12_val(12,:,1:v12_mz(12)), &
-!                       v12_val(13,:,1:v12_mz(13)),  v12_val(14,:,1:v12_mz(14)),  v12_val(15,:,1:v12_mz(15)),  v12_val(16,:,1:v12_mz(16)), &
-!                       v12_val(17,:,1:v12_mz(17)),  v12_val(18,:,1:v12_mz(18)),  v12_val(19,:,1:v12_mz(19)), v12_val(20,:,1:v12_mz(20)), &
-!                       v12_val(21,:,1:v12_mz(21)),  v12_val(22,:,1:v12_mz(22)),  v12_val(23,:,1:v12_mz(23)), v12_val(24,:,1:v12_mz(24)), &
-!                       v12_val(25,:,1:v12_mz(25)),  v12_val(26,:,1:v12_mz(26)),  v12_val(27,:,1:v12_mz(27)), v12_val(28,:,1:v12_mz(28)), &
-!                       v12_val(29,:,1:v12_mz(29)),  v12_val(30,:,1:v12_mz(30)),  v12_val(31,:,1:v12_mz(31)), v12_val(32,:,1:v12_mz(32)), &
-!                       v11_val, &
-!                       rf_len1, rf_len2, rf_len3, rf_len4, rf_len5, &
-!                       rf_len12(1,:), rf_len12(2,:), rf_len12(3,:), rf_len12(4,:), rf_len12(5,:), &
-!                       rf_len12(6,:), rf_len12(7,:), rf_len12(8,:), rf_len12(9,:), rf_len12(10,:), &
-!                       rf_len12(11,:), rf_len12(12,:), rf_len12(13,:), rf_len12(14,:), rf_len12(15,:), &
-!                       rf_len12(16,:), rf_len12(17,:), rf_len12(18,:), rf_len12(19,:), rf_len12(20,:), &
-!                       rf_len12(21,:), rf_len12(22,:), rf_len12(23,:), rf_len12(24,:), &
-!                       rf_len12(25,:), rf_len12(26,:), rf_len12(27,:), rf_len12(28,:), &
-!                       rf_len12(29,:), rf_len12(30,:), rf_len12(31,:), rf_len12(32,:), &
-!                       rf_len11 
-!   endif
-!
     be % v1 % val = v1_val
     be % v2 % val = v2_val
     be % v3 % val = v3_val
@@ -328,13 +257,12 @@ subroutine da_scale_background_errors ( be, it )
       if(allocated(rf_len11))deallocate(rf_len11)
     endif
 
-if(allocated(v11_val))  deallocate(v11_val)
-if(allocated(rf_len11)) deallocate(rf_len11)
-
 #if (WRF_CHEM == 1)
     if (chem_cv_options >=1) then
-        if(allocated(v12_val))  deallocate(v12_val)
-        if(allocated(rf_len12)) deallocate(rf_len12)
+    if(allocated(v11_val))  deallocate(v11_val)
+    if(allocated(v12_val))  deallocate(v12_val)
+    if(allocated(rf_len11)) deallocate(rf_len11)
+    if(allocated(rf_len12)) deallocate(rf_len12)
     endif !(chem_cv_options >=1) then
 #endif
 

@@ -23,6 +23,7 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
    real             :: err_o, err_r, maxv, maxe, maxb, maxo
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_chem_sfc")
+   print*,'da_get_innov_vector_chem_sfc: chem_cv_options, chemicda_opt =', chem_cv_options,chemicda_opt
 
    if ( it > 1 ) then
       do n=iv%info(chemic_surf)%n1,iv%info(chemic_surf)%n2
@@ -46,29 +47,53 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
 
    if (chem_cv_options == 108) then  ! racm_soa_vbs_da
 
-      if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then
-
-         ! Initialize first
-         model_chemic_surf(:,p_chemsi_pm25) = 0.
+      if (chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 4) then
 
          ! pm2.5
-         do n = p_chem_ic_so4aj, p_chem_ic_p25i 
-            model_chemic_surf(:,p_chemsi_pm25)=model_chemic_surf(:,p_chemsi_pm25)+model_rho(:,n)*model_chemic(:,n)
-         enddo
+         model_chemic_surf(:,p_chemsi_pm25)=model_rho(:,p_chem_ic_so4aj) * &
+                                           (model_chemic(:,p_chem_ic_so4aj) +model_chemic(:,p_chem_ic_so4ai) + &
+                                            model_chemic(:,p_chem_ic_nh4aj) +model_chemic(:,p_chem_ic_nh4ai) + &
+                                            model_chemic(:,p_chem_ic_no3aj) +model_chemic(:,p_chem_ic_no3ai) + &
+                                            model_chemic(:,p_chem_ic_naaj ) +model_chemic(:,p_chem_ic_naai ) + &
+                                            model_chemic(:,p_chem_ic_claj ) +model_chemic(:,p_chem_ic_clai ) + &
+                                            model_chemic(:,p_chem_ic_asoa1j)+model_chemic(:,p_chem_ic_asoa1i)+ &
+                                            model_chemic(:,p_chem_ic_asoa2j)+model_chemic(:,p_chem_ic_asoa2i)+ &
+                                            model_chemic(:,p_chem_ic_asoa3j)+model_chemic(:,p_chem_ic_asoa3i)+ &
+                                            model_chemic(:,p_chem_ic_asoa4j)+model_chemic(:,p_chem_ic_asoa4i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa1j)+model_chemic(:,p_chem_ic_bsoa1i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa2j)+model_chemic(:,p_chem_ic_bsoa2i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa3j)+model_chemic(:,p_chem_ic_bsoa3i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa4j)+model_chemic(:,p_chem_ic_bsoa4i)+ &
+                                            model_chemic(:,p_chem_ic_orgpaj)+model_chemic(:,p_chem_ic_orgpai)+ &
+                                            model_chemic(:,p_chem_ic_ecj   )+model_chemic(:,p_chem_ic_eci   )+ &
+                                            model_chemic(:,p_chem_ic_p25j  )+model_chemic(:,p_chem_ic_p25i  ))
 
       endif
 
-      if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5) then
-
-         ! Initialize first
-           model_chemic_surf(:,p_chemsi_pm10) = 0.
+      if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4) then
 
          ! pm10
-         do n = p_chem_ic_so4aj, p_chem_ic_antha
-            model_chemic_surf(:,p_chemsi_pm10)=model_chemic_surf(:,p_chemsi_pm10)+model_rho(:,n)*model_chemic(:,n)
-         enddo 
+         model_chemic_surf(:,p_chemsi_pm10)=model_rho(:,p_chem_ic_so4aj) * &
+                                           (model_chemic(:,p_chem_ic_so4aj) +model_chemic(:,p_chem_ic_so4ai) + &
+                                            model_chemic(:,p_chem_ic_nh4aj) +model_chemic(:,p_chem_ic_nh4ai) + &
+                                            model_chemic(:,p_chem_ic_no3aj) +model_chemic(:,p_chem_ic_no3ai) + &
+                                            model_chemic(:,p_chem_ic_naaj ) +model_chemic(:,p_chem_ic_naai ) + &
+                                            model_chemic(:,p_chem_ic_claj ) +model_chemic(:,p_chem_ic_clai ) + &
+                                            model_chemic(:,p_chem_ic_asoa1j)+model_chemic(:,p_chem_ic_asoa1i)+ &
+                                            model_chemic(:,p_chem_ic_asoa2j)+model_chemic(:,p_chem_ic_asoa2i)+ &
+                                            model_chemic(:,p_chem_ic_asoa3j)+model_chemic(:,p_chem_ic_asoa3i)+ &
+                                            model_chemic(:,p_chem_ic_asoa4j)+model_chemic(:,p_chem_ic_asoa4i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa1j)+model_chemic(:,p_chem_ic_bsoa1i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa2j)+model_chemic(:,p_chem_ic_bsoa2i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa3j)+model_chemic(:,p_chem_ic_bsoa3i)+ &
+                                            model_chemic(:,p_chem_ic_bsoa4j)+model_chemic(:,p_chem_ic_bsoa4i)+ &
+                                            model_chemic(:,p_chem_ic_orgpaj)+model_chemic(:,p_chem_ic_orgpai)+ &
+                                            model_chemic(:,p_chem_ic_ecj   )+model_chemic(:,p_chem_ic_eci   )+ &
+                                            model_chemic(:,p_chem_ic_p25j  )+model_chemic(:,p_chem_ic_p25i  )+ &
+                                            model_chemic(:,p_chem_ic_antha )+model_chemic(:,p_chem_ic_seas ) + &
+                                            model_chemic(:,p_chem_ic_soila ))
 
-      endif !(chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 5)
+      endif !(chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4)
 
       if (chemicda_opt == 4 .or. chemicda_opt == 5) then
 
@@ -110,7 +135,7 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
             ! Quality Control
             ! ----------------
             if (abs(iv % chemic_surf(n) % chem(ichem) % inv) .ge. maxomb) then
-                iv % chemic_surf(n) % chem(ichem) % inv   = missing_r
+                iv % chemic_surf(n) % chem(ichem) % inv   = 0.0   !missing_r
                 iv % chemic_surf(n) % chem(ichem) % qc    = missing
                 iv % chemic_surf(n) % chem(ichem) % error = missing_r
             end if
