@@ -56,7 +56,8 @@ subroutine da_get_vertical_truncation( max_vert_var, eigenval, be_sub)
       do k = 1, kz
          cum_variance = cum_variance + eigenval(k)
          
-         if (eigenval(k) <= 0.0) then
+         if (eigenval(k) <= 1e-12) then ! HA: Ignore trivial fields (ex. naaj, naai and seas)
+         !if (eigenval(k) <= 0.0) then
             be_sub % mz = k - 1
             exit
          end if
@@ -68,6 +69,7 @@ subroutine da_get_vertical_truncation( max_vert_var, eigenval, be_sub)
       end do
       
       if (max_vert_var == 0.0) be_sub % mz = 0 
+      if (be_sub % mz  == 0.0) be_sub % mz = 1    ! HA - to avoid segmentation fault 
 
    end if
 

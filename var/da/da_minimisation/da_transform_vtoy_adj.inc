@@ -270,8 +270,8 @@ subroutine da_transform_vtoy_adj(cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
             end if
          end if !4denvar
          call da_zero_x(grid%xa)
-         call da_zero_xchem_type(grid%xachem)
 #if (WRF_CHEM == 1)
+         call da_zero_xchem_type(grid%xachem)
          call da_transform_xtoy_adj(cv_size, cv_local, grid, iv, y, grid%xa, grid%xachem)
 #else
          call da_transform_xtoy_adj(cv_size, cv_local, grid, iv, y, grid%xa)

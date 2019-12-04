@@ -67,10 +67,9 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
                                             model_chemic(:,p_chem_ic_orgpaj)+model_chemic(:,p_chem_ic_orgpai)+ &
                                             model_chemic(:,p_chem_ic_ecj   )+model_chemic(:,p_chem_ic_eci   )+ &
                                             model_chemic(:,p_chem_ic_p25j  )+model_chemic(:,p_chem_ic_p25i  ))
-
       endif
 
-      if (chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4) then
+      if (chemicda_opt == 2) then
 
          ! pm10
          model_chemic_surf(:,p_chemsi_pm10)=model_rho(:,p_chem_ic_so4aj) * &
@@ -93,7 +92,16 @@ subroutine da_get_innov_vector_chem_sfc( it, num_qcstat_conv, grid, ob, iv)
                                             model_chemic(:,p_chem_ic_antha )+model_chemic(:,p_chem_ic_seas ) + &
                                             model_chemic(:,p_chem_ic_soila ))
 
-      endif !(chemicda_opt == 2 .or. chemicda_opt == 3 .or. chemicda_opt == 4)
+      endif !(chemicda_opt == 2) then
+
+      if (chemicda_opt == 3 .or. chemicda_opt == 4) then   ! pm2.5 and pm10
+
+         ! pm10 - pm2.5
+         model_chemic_surf(:,p_chemsi_pm10)=model_rho(:,p_chem_ic_antha) * &
+                                           (model_chemic(:,p_chem_ic_antha )+model_chemic(:,p_chem_ic_seas ) + &
+                                            model_chemic(:,p_chem_ic_soila ))
+
+      endif !(chemicda_opt == 3 .or. chemicda_opt == 4)
 
       if (chemicda_opt == 4 .or. chemicda_opt == 5) then
 

@@ -626,11 +626,7 @@
 #ifdef VAR4D
          call da_zero_vp_type (grid%vv6)
          call da_zero_vp_type (grid%vp6)
-#if (WRF_CHEM == 1)
-!!!         call da_zero_xch_type (grid%vch)
 #endif
-#endif
-
       end if
 
    !---------------------------------------------------------------------------
@@ -659,11 +655,11 @@
          call  da_scale_background_errors_cv3 ( grid, be, it )
       endif
 
+      print*,"da_solve calls da_initialize_cv: it=", it
       call da_initialize_cv (cv_size, xhat)
 
       ! [8.1] Calculate nonlinear model trajectory 
 
-!     if (var4d .and. multi_inc /= 2 ) then
       if (var4d) then
 #ifdef VAR4D
          if (it > 1) then
@@ -698,7 +694,7 @@
                   call kj_swap (grid%moist(:,:,:,i), model_grid%moist(:,:,:,i), &
                                 grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme, grid%xp%kms, grid%xp%kme)
                enddo
-            end if
+            end if  !  if ( .not. use_nonchemobs ) then
 #else
             call kj_swap (grid%u_2, model_grid%u_2, &
                           grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme, grid%xp%kms, grid%xp%kme)
@@ -819,7 +815,7 @@
 
             ! Turn off model boundary reading as we already provide a new one.
             if ( checkpoint_interval .eq. 0 ) call da_model_lbc_off
-         endif
+         endif   !  if (it > 1) then
 
          call nl_set_var4d_run (head_grid%id, .true.)
          if ( checkpoint_interval .gt. 0 ) write_checkpoints = 1
@@ -851,12 +847,11 @@
          end if
 #endif
 
-!      elseif (var4d .and. multi_inc == 2 ) then
 #else
          write(unit=message(1),fmt='(A)')'Please re-compile the code with 4dvar option'
          call da_error(__FILE__,__LINE__,message(1:1))
 #endif
-      end if
+      end if   !  if (var4d) then
 
       ! [8.2] Calculate innovation vector (O-B):
 
@@ -1061,6 +1056,7 @@
       !------------------------------------------------------------------------
       ! [8.10] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
+      print*,"da_solve: it, max_ext_its=", it, max_ext_its
       call da_transfer_xatoanalysis (it, xbx, grid, config_flags)
 
      if ( it < max_ext_its .and. print_detail_outerloop ) then

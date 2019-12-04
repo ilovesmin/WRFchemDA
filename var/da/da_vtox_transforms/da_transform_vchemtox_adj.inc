@@ -22,20 +22,22 @@ subroutine da_transform_vchemtox_adj(grid, vchem, be)
          vchem%chem_ic = 0.D0
 
    do ij = 1 , grid%num_tiles
+      if(jts.ne.grid%j_start(ij).or.jte.ne.grid%j_end(ij)) &
+      print*,"da_transform_vchemtox_adj: grid%itile, jts, grid%j_start(ij), jte, grid%j_end(ij) =",&
+             ij, jts, grid%j_start(ij), jte, grid%j_end(ij)
+
       do ic = PARAM_FIRST_SCALAR, num_chem
-!!!         vchem%chem_ic(:,grid%j_start(ij):grid%j_end(ij),:,ic) = 0.D0
-        do m = kts,kte !LEVELS
-         do n = 1, be % v12(ic-1) % mz  !EIGENMODES
-!               do j = grid%j_start(ij), grid%j_end(ij)
-               do j = jts, jte
+        do m = kts,kte                      !LEVELS
+         do n = 1, be % v12(ic-1) % mz      !EIGENMODES
+               do j = grid%j_start(ij), grid%j_end(ij)
                   temp = be % v12(ic-1) % evec (j,m,n) * be % v12(ic-1) % val (j,n)
                   do i = its, ite
-                      vchem%chem_ic (i,j,n,ic) = vchem%chem_ic (i,j,n,ic) + &
-                                                       temp * grid%xachem%chem_ic (i,j,m,ic) 
+                     vchem%chem_ic (i,j,n,ic) = vchem%chem_ic (i,j,n,ic) + &
+                                                temp * grid%xachem%chem_ic (i,j,m,ic) 
                   end do
                end do
-            end do
          end do
+        end do
       end do
    end do
    !$OMP END PARALLEL DO
@@ -43,5 +45,3 @@ subroutine da_transform_vchemtox_adj(grid, vchem, be)
    if (trace_use) call da_trace_exit("da_transform_vchemtox_adj")
 
 end subroutine da_transform_vchemtox_adj
-
-

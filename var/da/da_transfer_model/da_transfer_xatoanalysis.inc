@@ -15,7 +15,6 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
    character*4 filnam
    character(len=256) ::  timestr
 
-   integer n,ichem
    if (trace_use) call da_trace_entry("da_transfer_xatoanalysis")
 
    !---------------------------------------------------------------------------
@@ -31,8 +30,6 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
 
       call da_transfer_xatowrf(grid, config_flags)
 
-	n=1
-	ichem=2
       if (it < max_ext_its) then
          call da_transfer_wrftoxb(xbx, grid, config_flags)
 #if (WRF_CHEM == 1)

@@ -251,7 +251,6 @@ subroutine da_transform_vtovv_adj(grid, cv_size, be, cv, vv &
 
 !  if (present(vchem) .and. iv%info(chemic_surf)%nlocal > 0) then
   if (present(vchem)) then
-!!!   do ic = 1, num_chem-1
    do ic = PARAM_FIRST_SCALAR, num_chem
       mz = be % v12 (ic-1) % mz
       if( use_rf .and. mz > 0 ) then

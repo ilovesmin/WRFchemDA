@@ -10,28 +10,32 @@ subroutine da_transform_vchemtox(grid, vchem, be)
    type(xchem_type), intent(in) :: vchem   ! Grid point/EOF equivalent.
    type(be_type), intent(in)    :: be   ! Background error structure.
 
-   integer :: ij, ic, i, j, m, n  ! Loop counters
+   integer :: ij, ic, i, j, k, m  ! Loop counters
    integer :: mz
    real :: temp
 
    if (trace_use) call da_trace_entry("da_transform_vchemtox")
 
    !$OMP PARALLEL DO &
-   !$OMP PRIVATE ( ij, ic, m, n, j, i, temp )
-
-   grid%xachem%chem_ic = 0.D0
+   !$OMP PRIVATE ( ij, ic, k, m, j, i, temp )
 
    do ij = 1 , grid%num_tiles
+
+      grid%xachem%chem_ic(:,grid%j_start(ij):grid%j_end(ij),:,:) = 0.0
+
       do ic = PARAM_FIRST_SCALAR, num_chem
-         do m = kts, kte    !LEVELS
-            do n = 1, be % v12(ic-1) % mz !EIGENMODES
+         mz = be % v12(ic-1) % mz     !EIGENMODES
+
+         do k = kts, kte  !levels
+            do m = 1, mz
                do j = grid%j_start(ij), grid%j_end(ij)
-!               do j = jts, jte
-                  temp = be % v12(ic-1) % evec (j,m,n) * be % v12(ic-1) % val (j,n)
+                  temp = be % v12(ic-1) % evec (j,k,m) * be % v12(ic-1) % val (j,m)
+
                   do i = its, ite
-                      grid%xachem%chem_ic (i,j,m,ic) = grid%xachem%chem_ic (i,j,m,ic) + &
-                                                       temp * vchem%chem_ic (i,j,n,ic)
+                      grid%xachem%chem_ic (i,j,k,ic) = grid%xachem%chem_ic (i,j,k,ic) + &
+                                                       temp * vchem%chem_ic(i,j,m,ic)
                   end do
+
                end do
             end do
          end do
@@ -46,5 +50,3 @@ subroutine da_transform_vchemtox(grid, vchem, be)
    if (trace_use) call da_trace_exit("da_transform_vchemtox")
 
 end subroutine da_transform_vchemtox
-
-

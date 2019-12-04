@@ -744,7 +744,7 @@ subroutine da_transfer_xatowrf(grid, config_flags)
             do i=its,ite
                do k=kts, kte
                   ! Negative chem species are not allowed. If so, just keep the background value.
-		  if (grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic).lt.0.0) then
+		  if (grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic).le.0.0) then
 	              grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic)
 		  else
 	              grid%chem(i,j,k,ic) = grid%xbchem%chem_ic(i,j,k,ic) + grid%xachem%chem_ic(i,j,k,ic)
