@@ -17,7 +17,7 @@ subroutine da_write_obs_chem_sfc(it,ob, iv, re)
    character(len=120)  :: fmt_chem  = '(i8,3x,a6,2f9.2,5(2f17.7,i8,2f17.7))'
    character(len=120)  :: fmt_chem1 = '(i8,2x,a6,2f11.6,2f11.2,i8,2f11.2)'
    character(len=120)  :: fmt_chem2 = '(i8,2x,a6,2f11.6,2(2f11.2,i8,2f11.2))'
-   character(len=120)  :: fmt_chem4 = '(i8,2x,a6,2f11.6,4(2f11.2,i8,2f11.2))'
+   character(len=120)  :: fmt_chem4 = '(i8,2x,a6,2f11.6,4(2f11.3,i8,2f11.3))'
    integer :: itime, ifgat
 
    if (trace_use) call da_trace_entry("da_write_obs_chem_sfc")
@@ -57,7 +57,7 @@ subroutine da_write_obs_chem_sfc(it,ob, iv, re)
       iostat=ios)
    if (ios /= 0) then
       call da_error(__FILE__,__LINE__, &
-         (/"Cannot open conventional observation omb and oma file"//filename/))
+         (/"Cannot open chemical observation omb and oma file"//filename/))
    end if
 
    if (chemicda_opt == 4) then
@@ -65,7 +65,7 @@ subroutine da_write_obs_chem_sfc(it,ob, iv, re)
       iostat=ios2)
    if (ios2 /= 0) then
       call da_error(__FILE__,__LINE__, &
-         (/"Cannot open conventional observation omb and oma file"//filename2/))
+         (/"Cannot open gas observation omb and oma file"//filename2/))
    end if
    end if
 
@@ -160,13 +160,12 @@ subroutine da_write_obs_chem_sfc(it,ob, iv, re)
                iv%chemic_surf(n)%chem(p_chemsi_no2)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_no2)%qc,  &
                iv%chemic_surf(n)%chem(p_chemsi_no2)%error, &
-               re%chemic_surf(n)%chem(p_chemsi_o3), &
+               re%chemic_surf(n)%chem(p_chemsi_no2), &
                ob%chemic_surf(n)%chem(p_chemsi_o3), &
                iv%chemic_surf(n)%chem(p_chemsi_o3)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_o3)%qc,  &
                iv%chemic_surf(n)%chem(p_chemsi_o3)%error, &
                re%chemic_surf(n)%chem(p_chemsi_o3), &
-               re%chemic_surf(n)%chem(p_chemsi_co), &
                ob%chemic_surf(n)%chem(p_chemsi_co), &
                iv%chemic_surf(n)%chem(p_chemsi_co)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_co)%qc,  &
@@ -187,13 +186,12 @@ subroutine da_write_obs_chem_sfc(it,ob, iv, re)
                iv%chemic_surf(n)%chem(p_chemsi_no2)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_no2)%qc,  &
                iv%chemic_surf(n)%chem(p_chemsi_no2)%error, &
-               re%chemic_surf(n)%chem(p_chemsi_o3), &
+               re%chemic_surf(n)%chem(p_chemsi_no2), &
                ob%chemic_surf(n)%chem(p_chemsi_o3), &
                iv%chemic_surf(n)%chem(p_chemsi_o3)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_o3)%qc,  &
                iv%chemic_surf(n)%chem(p_chemsi_o3)%error, &
                re%chemic_surf(n)%chem(p_chemsi_o3), &
-               re%chemic_surf(n)%chem(p_chemsi_co), &
                ob%chemic_surf(n)%chem(p_chemsi_co), &
                iv%chemic_surf(n)%chem(p_chemsi_co)%inv, & 
                iv%chemic_surf(n)%chem(p_chemsi_co)%qc,  &
