@@ -50,17 +50,11 @@ subroutine da_transform_xtoy_chem_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
               do ichem = p_chem_ic_so4aj, p_chem_ic_p25i
                  model_chemic(:,ichem) = model_chemic(:,ichem) + model_rho(:,ichem) * model_chemic_surf(:,p_chemsi_pm25)
               end do
-              do ichem = p_chem_ic_so4aj, p_chem_ic_p25i
-                 call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
-              end do
          endif !(chemicda_opt == 1 .or. chemicda_opt == 3 .or. chemicda_opt == 4)
   
          if ( chemicda_opt == 2 ) then      ! pm10 only
               do ichem = p_chem_ic_so4aj, p_chem_ic_soila
                  model_chemic(:,ichem) = model_chemic(:,ichem) + model_rho(:,ichem) * model_chemic_surf(:,p_chemsi_pm10)
-              end do
-              do ichem = p_chem_ic_so4aj, p_chem_ic_soila
-                 call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
               end do
          endif !( chemicda_opt == 2 )
 
@@ -69,9 +63,6 @@ subroutine da_transform_xtoy_chem_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
               do ichem = p_chem_ic_antha, p_chem_ic_soila
                  model_chemic(:,ichem) = model_chemic(:,ichem) + model_rho(:,ichem) * model_chemic_surf(:,p_chemsi_pm10)
               end do
-              do ichem = p_chem_ic_antha, p_chem_ic_soila
-                 call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
-              end do
          endif !( chemicda_opt == 3 .or. chemicda_opt == 4 )
 
          if ( chemicda_opt == 4 .or. chemicda_opt == 5) then 
@@ -79,11 +70,11 @@ subroutine da_transform_xtoy_chem_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
               model_chemic(:,p_chem_ic_no2)=model_chemic_surf(:,p_chemsi_no2)
               model_chemic(:,p_chem_ic_o3 )=model_chemic_surf(:,p_chemsi_o3 )
               model_chemic(:,p_chem_ic_co )=model_chemic_surf(:,p_chemsi_co )
+         endif
 
-              do ichem = p_chem_ic_so2, p_chem_ic_co
-                 call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
-              end do
-        endif
+         do ichem = PARAM_FIRST_SCALAR, num_chem
+            call da_interp_lin_2d_adj (jo_grad_x%chem_ic(:,:,1,ichem), iv%info(chemic_surf), 1, model_chemic(:,ichem))
+         end do
 
      end if !(chem_cv_options == 108) then  ! racm_soa_vbs_da
 
