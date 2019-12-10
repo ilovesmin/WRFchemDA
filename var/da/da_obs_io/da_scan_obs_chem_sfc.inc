@@ -134,16 +134,16 @@ subroutine da_scan_obs_chem_sfc (iv, filename, grid)
             platform%chem(PARAM_FIRST_SCALAR+3)%inv = no2
             platform%chem(PARAM_FIRST_SCALAR+4)%inv = o3
             platform%chem(PARAM_FIRST_SCALAR+5)%inv = co
-            if(isite < 10000) & ! co at Chinese sites
-            platform%chem(PARAM_FIRST_SCALAR+5)%inv = platform%chem(PARAM_FIRST_SCALAR+5)%inv*1000 !!! mg to ug !!!
+            !if(isite < 10000) & ! co at Chinese sites
+            !platform%chem(PARAM_FIRST_SCALAR+5)%inv = platform%chem(PARAM_FIRST_SCALAR+5)%inv*1000 !!! mg to ug !!!
             platform%info%name                      = "all"
       case ( 5 )
             platform%chem(PARAM_FIRST_SCALAR  )%inv = so2
             platform%chem(PARAM_FIRST_SCALAR+1)%inv = no2
             platform%chem(PARAM_FIRST_SCALAR+2)%inv = o3
             platform%chem(PARAM_FIRST_SCALAR+3)%inv = co
-            if(isite < 10000) & ! co at Chinese sites
-            platform%chem(PARAM_FIRST_SCALAR+3)%inv = platform%chem(PARAM_FIRST_SCALAR+3)%inv*1000 !!! mg to ug !!!
+            !if(isite < 10000) & ! co at Chinese sites
+            !platform%chem(PARAM_FIRST_SCALAR+3)%inv = platform%chem(PARAM_FIRST_SCALAR+3)%inv*1000 !!! mg to ug !!!
             platform%info%name                      = "all_gas"
       case ( 6 )
             platform%chem(PARAM_FIRST_SCALAR  )%inv = so2
@@ -157,8 +157,8 @@ subroutine da_scan_obs_chem_sfc (iv, filename, grid)
       case ( 9 )
             platform%chem(PARAM_FIRST_SCALAR  )%inv = co
             platform%info%name                      = "co"
-            if(isite < 10000) & ! co at Chinese sites
-            platform%chem(PARAM_FIRST_SCALAR  )%inv = platform%chem(PARAM_FIRST_SCALAR  )%inv*1000 !!! mg to ug !!!
+            !if(isite < 10000) & ! co at Chinese sites
+            !platform%chem(PARAM_FIRST_SCALAR  )%inv = platform%chem(PARAM_FIRST_SCALAR  )%inv*1000 !!! mg to ug !!!
       case default
             platform%chem(PARAM_FIRST_SCALAR  )%inv = pm25
             platform%info%name                      = ""
