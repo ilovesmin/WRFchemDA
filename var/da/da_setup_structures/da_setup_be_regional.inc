@@ -210,7 +210,6 @@ subroutine da_setup_be_regional(xb, be, grid)
 
    rewind (be_unit)
    read (be_unit, iostat=ier) ni, nj, nk
-   print *, 'be.dat: ni, nj, nk = ', ni, nj, nk
    if (ier /= 0) then
       write (unit=message(1),fmt='(a,i3)') 'Error in reading be.dat, unit= ',be_unit
       call da_error(__FILE__,__LINE__,message(1:1))
@@ -2324,6 +2323,7 @@ subroutine da_setup_be_regional(xb, be, grid)
    call da_free_unit(be_unit)
 
    !print*,'use_rf, max_ext_its, jb_factor=',use_rf, max_ext_its, jb_factor
+
    if( use_rf )then
    ! 6.2 Keep the original be % v1, be % v2,...., and lengthscale in the first loop
    !     for the rescaling in the later loops:
@@ -2400,18 +2400,17 @@ subroutine da_setup_be_regional(xb, be, grid)
              enddo
              if ( chem_cv_options >= 1 ) then
 	        do i=1,num_cv_3d_chem
-                   write(be_print_unit,'("ichem, mz=",2i3,2x,"be%v12%val(j=89):"/(5e12.5))') &
-                         i,be%v12(i)%mz, be%v12(i)%val(89,1:5)
+                   write(be_print_unit,'("ichem, mz=",2i3,2x,"be%v12%val(1,1:5):"/(5e12.5))') &
+                         i,be%v12(i)%mz, be%v12(i)%val(1,1:5)
                    do k = 1,kz 
                       write(be_print_unit,'(A,i3,2x,e15.5)') "be12_rf_lengthscale: k=",k,be12_rf_lengthscale(i,k)
                    end do
                 end do
                 call da_message(message(i+6:num_cv_3d_chem+6))
              end if
-    
-          endif
+          endif  !  if (print_detail_be ) then
 
-      endif
+      endif      !  if (max_ext_its > 1 .and. jb_factor > 0.0)
 
       ! 7.0 Apply empirical and recursive filter rescaling factor:
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2479,7 +2478,8 @@ subroutine da_setup_be_regional(xb, be, grid)
 
        if ( chem_cv_options >= 1 ) then
        do i=1,num_cv_3d_chem
-       write(be_print_unit,'("mz=",i3,2x,"be%v12%val at i=",a,i3,/(10e12.5))') be%v12(i)%mz, be%v12(i)%name,i,be%v12(i)%val(1,:)
+       write(be_print_unit,'("mz=",i3,2x,"be%v12%val(1,1:10) at ichem=",a,i3,/(10e12.5))') &
+             be%v12(i)%mz, be%v12(i)%name,i,be%v12(i)%val(1,1:10)
        end do
        end if
 
@@ -2504,7 +2504,7 @@ subroutine da_setup_be_regional(xb, be, grid)
 
        if ( chem_cv_options >= 1 ) then
        do i=1,num_cv_3d_chem
-          write(be_print_unit,'("be%v12%rf_alpha: i = ",i3,a,/(5f10.5))') i,be%v12(i)%name,be%v12(i)%rf_alpha(:10)
+          write(be_print_unit,'("be%v12%rf_alpha: i = ",i3,a,/(5f10.5))') i,be%v12(i)%name,be%v12(i)%rf_alpha(:5)
        end do
        end if
 

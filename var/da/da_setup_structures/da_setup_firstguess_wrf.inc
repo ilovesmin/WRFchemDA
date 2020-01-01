@@ -219,7 +219,6 @@ subroutine da_setup_firstguess_wrf(xbx, grid, config_flags, ens)
    end do
 
    call da_transfer_wrftoxb_gocart(grid)
-
 #endif
 
    if ( .not. ens ) then

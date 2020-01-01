@@ -60,7 +60,11 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
  
          if (print_detail_be) then
             write(unit=message(1),fmt='(A,A)') 'j*k Eigenvalues for ', be_sub % name
+            if (vert_evalue == vert_evalue_global) then
+            call da_array_print(2, be_sub % val(1:2,1:mz), message(1))
+            else
             call da_array_print(2, be_sub % val(1:jy,1:mz), message(1))
+            endif
          end if
 
          !----------------------------------------------------------------------- 
@@ -83,8 +87,11 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
             write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = 1 ', be_sub % name
             call da_array_print (2, be_sub % evec(1,1:kz,1:mz), message(1))
          
+            if (vert_evalue /= vert_evalue_global) then
             write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = jy ', be_sub % name
             call da_array_print (2, be_sub % evec(jy,1:kz,1:mz), message(1))
+            endif
+       
          end if
 
          allocate (be_sub%val_g(1:mz))

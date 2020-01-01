@@ -30,7 +30,8 @@ subroutine da_final_write_obs_chem_sfc(it,iv)
          write(unit=filename(k),fmt ='(a,i2.2,a,i4.4)')'chem_omb_oma_',it,'.',k
       end do 
       call da_get_unit(omb_unit)
-       write(unit=file,fmt ='(a,i2.2)')'chem_omb_oma_',it
+
+      write(unit=file,fmt ='(a,i2.2)')'chem_omb_oma_',it
       open(unit=omb_unit,file=trim(file),form='formatted', status='replace', iostat=ios) 
       if (ios /= 0) call da_error(__FILE__,__LINE__, &
          (/"Cannot open file "//file/))
@@ -51,7 +52,6 @@ subroutine da_final_write_obs_chem_sfc(it,iv)
       end do
    end if
 
-
    if (rootproc) then
       close(iunit)
       close(omb_unit)
@@ -63,5 +63,3 @@ subroutine da_final_write_obs_chem_sfc(it,iv)
    if (trace_use) call da_trace_exit("da_final_write_obs_chem_sfc")
    
 end subroutine da_final_write_obs_chem_sfc
-
-
